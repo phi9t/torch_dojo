@@ -1,0 +1,3 @@
+# Keep dojo exercises as interactive scripts
+
+Learners temporarily edit question scripts and use Emacs with a Jupyter kernel to run top-level cells, check their answer, and revise it. The paired eval script contains a runnable reference and ordinary Python verifiers. Saved-file evaluation selects explicit setup, answer, and verifier cells while leaving teaching probes and reference execution out of learner checks. We chose tagged cells over inferring dependencies from a target function because an answer can depend on top-level state and helpers; the tags also keep the selection independent of lesson step numbers. This contract applies to every dojo exercise pair and preserves direct script execution without a `main()` function.

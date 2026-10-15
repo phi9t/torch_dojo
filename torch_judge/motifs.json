@@ -1,0 +1,230 @@
+[
+  {
+    "id": "stable-normalization",
+    "title": "Shift before you exponentiate",
+    "topic": "stability",
+    "workouts": [
+      "0002",
+      "0059",
+      "0060",
+      "0123"
+    ],
+    "prompt": "Logits are [1000, 1001]. What can you subtract without changing softmax? Predict the two probabilities.",
+    "answer": "Subtract 1001 from both: [-1, 0]. The probabilities are about [0.269, 0.731]. A shared shift cancels between numerator and denominator; exponentiating the original values can overflow.",
+    "probe": "import numpy as np\nx = np.array([1000., 1001.])\ne = np.exp(x - x.max())\nprint(e / e.sum())",
+    "transfer": "Recognise this in cross-entropy, attention, and any normalised exponential."
+  },
+  {
+    "id": "scatter-collisions",
+    "title": "Collisions are contributions",
+    "topic": "indexing",
+    "workouts": [
+      "0066",
+      "0077",
+      "0114",
+      "0107"
+    ],
+    "prompt": "Rows with values [2, 3, 5] land at indices [0, 0, 1]. Starting from zeros, what should a scatter-sum produce? Why is indexed += risky?",
+    "answer": "[5, 5]. Repeated destinations must accumulate. NumPy fancy-indexed += uses a temporary and can lose repeated contributions; np.add.at (or torch.index_add) accumulates them.",
+    "probe": "import numpy as np\nidx = np.array([0, 0, 1]); values = np.array([2, 3, 5])\na = np.zeros(2, dtype=int); b = a.copy()\na[idx] += values\nnp.add.at(b, idx, values)\nprint(a, b)",
+    "transfer": "Try three rows colliding instead of two. The destination is shared; each contribution still counts."
+  },
+  {
+    "id": "gather-group-totals",
+    "title": "Reduce to groups, gather back to rows",
+    "topic": "indexing",
+    "workouts": [
+      "0066",
+      "0115",
+      "0108"
+    ],
+    "prompt": "Group IDs are [0, 1, 0], and row weights are [1, 10, 3]. Predict the totals gathered back to each row, then each row’s share.",
+    "answer": "Group totals [4, 10] gather to [4, 10, 4]. Shares are [0.25, 1, 0.75]. Reduce in group space, then index by group ID to return to row space.",
+    "probe": "import numpy as np\ng = np.array([0, 1, 0]); w = np.array([1., 10., 3.])\ntotals = np.zeros(2); np.add.at(totals, g, w)\nprint(totals[g], w / totals[g])",
+    "transfer": "Use this whenever each row needs a statistic of its own group. Decide what zero-total groups mean before dividing."
+  },
+  {
+    "id": "weighted-means",
+    "title": "Carry the mass with the mean",
+    "topic": "reductions",
+    "workouts": [
+      "0066",
+      "0115",
+      "0108",
+      "0123"
+    ],
+    "prompt": "One group has mean 2 from 3 observations; another has mean 8 from 1 observation. What is their combined mean? What information would be lost by keeping only the means?",
+    "answer": "(2×3 + 8×1) / 4 = 3.5, not 5. A mean needs its weight or count to be merged correctly. Split attention similarly carries normalisation mass, represented by log-sum-exp.",
+    "probe": "import numpy as np\nmeans = np.array([2., 8.]); counts = np.array([3., 1.])\nprint(means.mean(), np.sum(means * counts) / counts.sum())",
+    "transfer": "Change the counts but keep the means fixed. Predict which mean the result moves toward."
+  },
+  {
+    "id": "compact-restore",
+    "title": "Compact, remember, restore",
+    "topic": "indexing",
+    "workouts": [
+      "0065",
+      "0117",
+      "0107"
+    ],
+    "prompt": "For mask [[True, False, True], [False, True, True]], list the kept (batch, slot) addresses and an inverse map holding compact row IDs, with -1 for dropped slots.",
+    "answer": "Addresses: (0,0), (0,2), (1,1), (1,2), in row-major order. Inverse: [[0,-1,1],[-1,2,3]]. The address list and boolean selection share the same order.",
+    "probe": "import numpy as np\nm = np.array([[1, 0, 1], [0, 1, 1]], dtype=bool)\ninverse = np.full(m.shape, -1); inverse[m] = np.arange(m.sum())\nprint(np.argwhere(m)); print(inverse)",
+    "transfer": "Keep the address map whenever later results must return to the original padded layout."
+  },
+  {
+    "id": "flat-addresses",
+    "title": "An address is a contract",
+    "topic": "indexing",
+    "workouts": [
+      "0066",
+      "0116",
+      "0119"
+    ],
+    "prompt": "In a row-major grid of shape (2, 3), what is the flat address of (1, 2)? Why must you reject (0, 3) before flattening?",
+    "answer": "(1,2) maps to 1×3+2 = 5. Invalid (0,3) would map to 3, aliasing valid (1,0). Validate each coordinate against its own axis bounds first.",
+    "probe": "import numpy as np\nprint(np.ravel_multi_index((1, 2), (2, 3)))\nprint(0 * 3 + 3, 1 * 3 + 0)",
+    "transfer": "Write the strides for a three-axis grid and repeat the argument at each boundary."
+  },
+  {
+    "id": "unique-inverse",
+    "title": "Group once, keep the inverse",
+    "topic": "indexing",
+    "workouts": [
+      "0066",
+      "0077",
+      "0118"
+    ],
+    "prompt": "Keys are [[2,0], [1,4], [2,0]]. Predict sorted unique keys and inverse IDs. How can you reconstruct the original keys?",
+    "answer": "Unique keys [[1,4],[2,0]], inverse [1,0,1]. Indexing unique keys with inverse IDs reconstructs the input. Those IDs also name destinations for group reductions.",
+    "probe": "import numpy as np\nkeys = np.array([[2, 0], [1, 4], [2, 0]])\nu, inv = np.unique(keys, axis=0, return_inverse=True)\nprint(u); print(inv); print(u[inv])",
+    "transfer": "The unique table lives in group space; the inverse map lives in input-row space."
+  },
+  {
+    "id": "gather-backward",
+    "title": "Gather forward, scatter-add backward",
+    "topic": "gradients",
+    "workouts": [
+      "0120",
+      "0101",
+      "0112"
+    ],
+    "prompt": "y = x[[1, 1, 0]]. Upstream gradients for y are [2, 3, 7]. What gradient reaches each of the three rows of x?",
+    "answer": "[7, 5, 0]. Both uses of row 1 contribute to its gradient. An unused row receives zero. The backward of a gather adds into the source rows.",
+    "probe": "import numpy as np\ndx = np.zeros(3)\nnp.add.at(dx, [1, 1, 0], [2, 3, 7])\nprint(dx)",
+    "transfer": "Repeated reads become repeated gradient contributions, not overwrites."
+  },
+  {
+    "id": "broadcast-pairs",
+    "title": "Name the axes before broadcasting",
+    "topic": "shapes",
+    "workouts": [
+      "0062",
+      "0064",
+      "0070"
+    ],
+    "prompt": "A has shape (N, 3) and B has shape (M, 3). What shape does A[:, None, :] - B[None, :, :] have? Which axis represents a pair’s coordinates?",
+    "answer": "(N, M, 3). The singleton axes let each A row meet every B row; the last axis still represents coordinates. A reduction over the last axis gives one number per pair.",
+    "probe": "import numpy as np\na = np.zeros((2, 3)); b = np.ones((4, 3))\nd = a[:, None, :] - b[None, :, :]\nprint(d.shape, np.linalg.norm(d, axis=-1).shape)",
+    "transfer": "Estimate N×M×3 memory before building the pairwise array. Large inputs may need blocks."
+  },
+  {
+    "id": "mask-before-arithmetic",
+    "title": "Remove invalid data before arithmetic",
+    "topic": "stability",
+    "workouts": [
+      "0065",
+      "0066",
+      "0105",
+      "0117"
+    ],
+    "prompt": "Values are [2, NaN], with valid mask [True, False]. Does multiplying by the mask safely produce a sum of 2? Predict the result and a safe alternative.",
+    "answer": "No: NaN×0 is NaN. Select valid values first, or replace invalid inputs before risky arithmetic. Masking an already-invalid result may be too late, especially for gradients.",
+    "probe": "import numpy as np\nx = np.array([2., np.nan]); valid = np.array([True, False])\nprint((x * valid).sum(), x[valid].sum())",
+    "transfer": "Try an entirely invalid row. Its output and denominator policy need an explicit contract."
+  },
+  {
+    "id": "frame-inverse",
+    "title": "Undo translation, then rotation",
+    "topic": "geometry",
+    "workouts": [
+      "0063",
+      "0064",
+      "0065"
+    ],
+    "prompt": "Row-stored points obey world = local @ R.T + center. For an orthonormal rotation R, recover local. Which operation must happen first?",
+    "answer": "local = (world - center) @ R. Remove the translation in world coordinates, then apply the inverse rotation. Transpose conventions depend on whether vectors are stored as rows or columns.",
+    "probe": "import numpy as np\nr = np.array([[0., -1.], [1., 0.]])\nlocal = np.array([[1., 0.]]); center = np.array([10., 20.])\nworld = local @ r.T + center\nprint(world, (world - center) @ r)",
+    "transfer": "Name both source and destination frames before composing multiple transforms."
+  },
+  {
+    "id": "half-open-bounds",
+    "title": "Give every boundary one owner",
+    "topic": "geometry",
+    "workouts": [
+      "0066",
+      "0068",
+      "0116"
+    ],
+    "prompt": "Cells have width 1, origin 0, and cover [0, 2). Where do points 0, 0.999, 1, and 2 go? Why exclude the upper edge?",
+    "answer": "Cell IDs 0, 0, 1, then outside. Half-open intervals assign a shared edge to exactly one cell. Including 2 would create an out-of-range cell ID 2.",
+    "probe": "import numpy as np\nx = np.array([0., .999, 1., 2.])\nvalid = (x >= 0) & (x < 2)\nprint(valid, np.floor(x[valid]).astype(int))",
+    "transfer": "Repeat with a nonzero origin. Subtract the origin before dividing by cell width."
+  },
+  {
+    "id": "layout-vs-shape",
+    "title": "A new shape is not a new axis order",
+    "topic": "shapes",
+    "workouts": [
+      "0110",
+      "0119",
+      "0005"
+    ],
+    "prompt": "For x = [[0,1,2],[3,4,5]], compare x.reshape(3,2) with x.T. Do they contain the same rows? Which operation swaps axis meanings?",
+    "answer": "reshape gives [[0,1],[2,3],[4,5]]; transpose gives [[0,3],[1,4],[2,5]]. Transpose swaps axes. Reshape groups the traversal into a new shape; it does not substitute for an axis permutation.",
+    "probe": "import numpy as np\nx = np.arange(6).reshape(2, 3)\nprint(x.reshape(3, 2)); print(x.T)\nprint(np.shares_memory(x, x.T))",
+    "transfer": "After a permutation, check strides and whether a later reshape needs a copy."
+  },
+  {
+    "id": "snapshot-update",
+    "title": "Differentiate one snapshot, update once",
+    "topic": "training",
+    "workouts": [
+      "0003",
+      "0060",
+      "0102"
+    ],
+    "prompt": "In a two-parameter training step, may you update W before computing a gradient that depends on the old W? What state should all gradients describe?",
+    "answer": "All gradients in the same ordinary gradient-descent step describe the same pre-update parameter snapshot. Updating early silently mixes two different models. Compute gradients first, then apply updates.",
+    "probe": "import numpy as np\nw = np.array([2.]); v = np.array([3.]); lr = .1\ndw, dv = v.copy(), w.copy()  # loss = w * v\nprint(w - lr * dw, v - lr * dv)",
+    "transfer": "This also matters when accumulating microbatches: keep the objective’s normalisation consistent."
+  },
+  {
+    "id": "detach-targets",
+    "title": "Choose where credit can flow",
+    "topic": "gradients",
+    "workouts": [
+      "0084",
+      "0086",
+      "0088"
+    ],
+    "prompt": "A policy loss is -log_prob × advantage. If advantage came from another differentiable model, should this policy objective automatically train that model too?",
+    "answer": "Only if the objective explicitly calls for that path. In these policy workouts, advantage is a fixed weight for the policy gradient: detach it, while keeping log_prob connected. Train a value baseline with its own objective.",
+    "probe": "import numpy as np\nlog_prob, advantage = -.7, 2.\nprint(-log_prob * advantage)\nprint(\"policy derivative w.r.t. log_prob:\", -advantage)",
+    "transfer": "Draw the intended gradient paths before writing detach. The numerical value alone cannot tell you which paths are correct."
+  },
+  {
+    "id": "merge-softmax-blocks",
+    "title": "Merge normalised blocks by their mass",
+    "topic": "attention",
+    "workouts": [
+      "0025",
+      "0123",
+      "0124"
+    ],
+    "prompt": "Two attention blocks return outputs 2 and 8, with normalisation masses 3 and 1. How do you merge them? If masses are stored as log-sum-exp values, what are the weights?",
+    "answer": "The merged output is 3.5. With log masses l_i, use exp(l_i - logsumexp(l)) as weights. An empty or fully masked block contributes zero mass; an all-empty row needs an explicit zero-output path.",
+    "probe": "import numpy as np\nlse = np.log([3., 1.])\nm = lse.max(); total = m + np.log(np.exp(lse - m).sum())\nw = np.exp(lse - total)\nprint(w, w @ np.array([2., 8.]))",
+    "transfer": "The same “carry the mass” idea appears in weighted means, now made stable in log space."
+  }
+]

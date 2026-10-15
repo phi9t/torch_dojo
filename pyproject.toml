@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torch-judge"
+dynamic = ["version"]
+description = "PyTorch and NumPy coding exercises with a small local judge."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "duoan" }
+]
+keywords = ["pytorch", "judge", "vision", "3d", "autonomy", "practice"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24",
+    "torch>=2.0",
+    "hypothesis[numpy]>=6.100",
+]
+
+[project.optional-dependencies]
+tui = [
+    "textual>=6,<7",
+]
+dev = [
+    "build",
+    "twine",
+]
+
+[tool.setuptools.packages.find]
+include = ["torch_judge*"]
+exclude = ["dojo*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "torch_judge._version.__version__"}
+
+[tool.pytest.ini_options]
+norecursedirs = ["target", ".git", ".venv"]
+
+[tool.setuptools.package-data]
+torch_judge = ["motifs.json"]

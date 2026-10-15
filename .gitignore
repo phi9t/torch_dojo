@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+node_modules/
+browser_gym/build/
+browser_gym/dist/
+browser_gym/.cache/
+browser_gym/.offline-cache/
+browser_gym/pypi/
+browser_gym/static/
+browser_gym/extension/lib/
+browser_gym/extension/labextension/
+browser_gym/extension/test-results/
+browser_gym/.hypothesis/
+browser_gym/.jupyterlite.doit.db
+dist/
+build/
+.DS_Store
+
+target/
+
+# Local credentials and runtime state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+docs/research/*-jupyter-insula.md
+
+# Personal recall archive exported by the practice notebook
+/motif-reviews.json
