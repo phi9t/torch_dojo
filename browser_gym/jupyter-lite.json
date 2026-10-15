@@ -1,0 +1,36 @@
+{
+  "jupyter-lite-schema-version": 0,
+  "jupyter-config-data": {
+    "appName": "Torch Dojo Browser Gym",
+    "disabledExtensions": [
+      "@jupyterlab/application-extension:logo",
+      "@jupyterlab/application-extension:property-inspector",
+      "@jupyterlab/application-extension:top-bar",
+      "@jupyterlab/cell-toolbar-extension:plugin",
+      "@jupyterlab/apputils-extension:announcements",
+      "@jupyterlab/apputils-extension:kernel-status",
+      "@jupyterlab/apputils-extension:notification",
+      "@jupyterlab/apputils-extension:palette",
+      "@jupyterlab/apputils-extension:palette-restorer",
+      "@jupyterlab/apputils-extension:running-sessions-status",
+      "@jupyterlab/console-extension:kernel-status",
+      "@jupyterlab/debugger-extension:sidebar",
+      "@jupyterlab/extensionmanager-extension:plugin",
+      "@jupyterlab/filebrowser-extension:file-upload-status",
+      "@jupyterlab/filebrowser-extension:widget",
+      "@jupyterlab/help-extension:resources",
+      "@jupyterlab/launcher-extension:plugin",
+      "@jupyterlab/mainmenu-extension:plugin",
+      "@jupyterlab/mainmenu-extension:recents",
+      "@jupyterlab/notebook-extension:completer",
+      "@jupyterlab/notebook-extension:kernel-status",
+      "@jupyterlab/notebook-extension:toc",
+      "@jupyterlab/running-extension:sidebar",
+      "@jupyterlab/statusbar-extension:plugin",
+      "@jupyterlab/toc-extension:registry",
+      "@jupyterlab/toc-extension:tracker",
+      "@jupyterlab/workspaces-extension:sidebar",
+      "@jupyterlite/application-extension:logo"
+    ]
+  }
+}

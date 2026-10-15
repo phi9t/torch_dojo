@@ -1,0 +1,83 @@
+[
+  {
+    "previous": null,
+    "rating": "again",
+    "now": 1000,
+    "expected": {
+      "due": 1600,
+      "reviewed": 1000,
+      "interval": 600,
+      "rating": "again"
+    }
+  },
+  {
+    "previous": null,
+    "rating": "hard",
+    "now": 1000,
+    "expected": {
+      "due": 87400,
+      "reviewed": 1000,
+      "interval": 86400,
+      "rating": "hard"
+    }
+  },
+  {
+    "previous": null,
+    "rating": "good",
+    "now": 1000,
+    "expected": {
+      "due": 260200,
+      "reviewed": 1000,
+      "interval": 259200,
+      "rating": "good"
+    }
+  },
+  {
+    "previous": {
+      "due": 0,
+      "reviewed": 0,
+      "interval": 259200,
+      "rating": "good"
+    },
+    "rating": "good",
+    "now": 2000,
+    "expected": {
+      "due": 520400,
+      "reviewed": 2000,
+      "interval": 518400,
+      "rating": "good"
+    }
+  },
+  {
+    "previous": {
+      "due": 0,
+      "reviewed": 0,
+      "interval": 7776000,
+      "rating": "good"
+    },
+    "rating": "good",
+    "now": 3000,
+    "expected": {
+      "due": 7779000,
+      "reviewed": 3000,
+      "interval": 7776000,
+      "rating": "good"
+    }
+  },
+  {
+    "previous": {
+      "due": 0,
+      "reviewed": 0,
+      "interval": 7776000,
+      "rating": "good"
+    },
+    "rating": "again",
+    "now": 3000,
+    "expected": {
+      "due": 3600,
+      "reviewed": 3000,
+      "interval": 600,
+      "rating": "again"
+    }
+  }
+]

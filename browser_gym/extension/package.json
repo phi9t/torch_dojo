@@ -1,0 +1,47 @@
+{
+  "name": "@torch-dojo/browser-gym",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Focused browser notebook checking for Torch Dojo",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "files": [
+    "lib",
+    "labextension",
+    "style"
+  ],
+  "scripts": {
+    "build": "tsc && jupyter labextension build .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run src",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.10.2",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.14",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "@fontsource/newsreader": "5.3.0",
+    "@jupyterlab/application": "^4.5.11",
+    "@jupyterlab/cells": "^4.5.11",
+    "@jupyterlab/codemirror": "^4.5.11",
+    "@jupyterlab/docmanager": "^4.5.11",
+    "@jupyterlab/notebook": "^4.5.11",
+    "@jupyterlab/rendermime": "^4.5.11",
+    "@lumino/messaging": "^2.0.5",
+    "@lumino/widgets": "^2.7.5"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "^4.5.11",
+    "@playwright/test": "^1.63.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "labextension"
+  }
+}

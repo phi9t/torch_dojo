@@ -1,0 +1,1940 @@
+/*
+ * Torch Dojo browser gym: a calm, mathematical page.
+ *
+ * One token set (light and dark) drives both the gym's own panels and
+ * JupyterLab's editor, outputs and rendered markdown, by overriding
+ * JupyterLab's --jp-* variables. The theme is resolved by src/theme.ts into
+ * <html data-dojo-theme="light|dark">.
+ */
+@import url('~@fontsource/newsreader/latin-400.css');
+@import url('~@fontsource/newsreader/latin-400-italic.css');
+@import url('~@fontsource/newsreader/latin-500.css');
+@import url('~@fontsource/newsreader/latin-600.css');
+@import url('~@fontsource/jetbrains-mono/latin-400.css');
+@import url('~@fontsource/jetbrains-mono/latin-600.css');
+
+/* ---------- design tokens ---------- */
+
+:root body.dojo-browser-gym {
+  --dojo-bg: #f2f3f0;
+  --dojo-surface: #fbfbf9;
+  --dojo-slate: #e7e9e5;
+  --dojo-fg: #1d2421;
+  --dojo-muted: #5d6762;
+  --dojo-faint: #858e88;
+  --dojo-rule: #d5d9d3;
+  --dojo-accent: #2e6b63;
+  --dojo-accent-soft: #dde9e5;
+  --dojo-on-accent: #fbfbf9;
+  --dojo-seal: #b4452f;
+  --dojo-pass: #2f7a4b;
+  --dojo-fail: #9e2f4a;
+  --dojo-warn: #85621b;
+  --dojo-pass-soft: #e0eee4;
+  --dojo-fail-soft: #f5e1e6;
+  --dojo-warn-soft: #f3ead6;
+  --dojo-code-bg: #fbfbf9;
+  --dojo-code-fg: #1d2421;
+  --dojo-selection: #cfe0db;
+  --dojo-tok-keyword: #7a3e8f;
+  --dojo-tok-def: #1f5f8b;
+  --dojo-tok-string: #8a5a1f;
+  --dojo-tok-number: #2e6b63;
+  --dojo-tok-comment: #7d8680;
+  --dojo-shadow: 0 1px 2px rgb(29 36 33 / 6%), 0 8px 24px rgb(29 36 33 / 6%);
+  --dojo-serif: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --dojo-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+:root[data-dojo-theme="dark"] body.dojo-browser-gym {
+  --dojo-bg: #121614;
+  --dojo-surface: #171c1a;
+  --dojo-slate: #1d2320;
+  --dojo-fg: #dde3df;
+  --dojo-muted: #9aa49f;
+  --dojo-faint: #7a847f;
+  --dojo-rule: #2b332f;
+  --dojo-accent: #86bcb1;
+  --dojo-accent-soft: #22322e;
+  --dojo-on-accent: #121614;
+  --dojo-seal: #e07a62;
+  --dojo-pass: #8cc79e;
+  --dojo-fail: #ee93a8;
+  --dojo-warn: #dcb871;
+  --dojo-pass-soft: #1f3226;
+  --dojo-fail-soft: #3a2129;
+  --dojo-warn-soft: #362d1b;
+  --dojo-code-bg: #141917;
+  --dojo-code-fg: #dde3df;
+  --dojo-selection: #2c4540;
+  --dojo-tok-keyword: #c79be0;
+  --dojo-tok-def: #8fc0e8;
+  --dojo-tok-string: #e2b77c;
+  --dojo-tok-number: #86bcb1;
+  --dojo-tok-comment: #78827d;
+  --dojo-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 25%);
+  color-scheme: dark;
+}
+
+/* JupyterLab follows the gym's tokens. */
+body.dojo-browser-gym {
+  --jp-layout-color0: var(--dojo-surface);
+  --jp-layout-color1: var(--dojo-bg);
+  --jp-layout-color2: var(--dojo-slate);
+  --jp-layout-color3: var(--dojo-rule);
+  --jp-layout-color4: var(--dojo-faint);
+  --jp-inverse-layout-color0: var(--dojo-fg);
+  --jp-inverse-layout-color1: var(--dojo-fg);
+  --jp-border-color0: var(--dojo-rule);
+  --jp-border-color1: var(--dojo-rule);
+  --jp-border-color2: var(--dojo-rule);
+  --jp-border-color3: var(--dojo-rule);
+  --jp-ui-font-color0: var(--dojo-fg);
+  --jp-ui-font-color1: var(--dojo-fg);
+  --jp-ui-font-color2: var(--dojo-muted);
+  --jp-ui-font-color3: var(--dojo-faint);
+  --jp-content-font-color0: var(--dojo-fg);
+  --jp-content-font-color1: var(--dojo-fg);
+  --jp-content-font-color2: var(--dojo-muted);
+  --jp-content-font-color3: var(--dojo-faint);
+  --jp-content-link-color: var(--dojo-accent);
+  --jp-content-link-visited-color: var(--dojo-accent);
+  --jp-brand-color1: var(--dojo-accent);
+  --jp-brand-color2: var(--dojo-accent-soft);
+  --jp-ui-font-family: var(--dojo-serif);
+  --jp-content-font-family: var(--dojo-serif);
+  --jp-code-font-family: var(--dojo-mono);
+  --jp-code-font-family-default: var(--dojo-mono);
+  --jp-code-font-size: 13px;
+  --jp-content-font-size1: 17px;
+  --jp-cell-editor-background: var(--dojo-code-bg);
+  --jp-cell-editor-border-color: var(--dojo-rule);
+  --jp-cell-editor-active-background: var(--dojo-code-bg);
+  --jp-cell-editor-active-border-color: var(--dojo-accent);
+  --jp-cell-prompt-not-active-font-color: var(--dojo-faint);
+  --jp-cell-inprompt-font-color: var(--dojo-faint);
+  --jp-cell-outprompt-font-color: var(--dojo-faint);
+  --jp-cell-prompt-font-family: var(--dojo-mono);
+  --jp-input-active-background: var(--dojo-surface);
+  --jp-editor-selected-background: var(--dojo-selection);
+  --jp-editor-selected-focused-background: var(--dojo-selection);
+  --jp-editor-cursor-color: var(--dojo-accent);
+  --jp-icon1: var(--dojo-fg);
+  --jp-icon2: var(--dojo-muted);
+  --jp-icon3: var(--dojo-muted);
+  --jp-icon4: var(--dojo-faint);
+  --jp-icon-contrast-color0: var(--dojo-accent);
+  --jp-rendermime-error-background: var(--dojo-fail-soft);
+  --jp-rendermime-table-row-background: var(--dojo-slate);
+  --jp-rendermime-table-row-hover-background: var(--dojo-accent-soft);
+  --jp-notebook-select-background: var(--dojo-accent-soft);
+  --jp-notebook-multiselected-color: var(--dojo-accent-soft);
+  --jp-mirror-editor-keyword-color: var(--dojo-tok-keyword);
+  --jp-mirror-editor-atom-color: var(--dojo-tok-number);
+  --jp-mirror-editor-number-color: var(--dojo-tok-number);
+  --jp-mirror-editor-def-color: var(--dojo-tok-def);
+  --jp-mirror-editor-variable-color: var(--dojo-code-fg);
+  --jp-mirror-editor-variable-2-color: var(--dojo-tok-def);
+  --jp-mirror-editor-variable-3-color: var(--dojo-tok-def);
+  --jp-mirror-editor-punctuation-color: var(--dojo-muted);
+  --jp-mirror-editor-property-color: var(--dojo-code-fg);
+  --jp-mirror-editor-operator-color: var(--dojo-muted);
+  --jp-mirror-editor-comment-color: var(--dojo-tok-comment);
+  --jp-mirror-editor-string-color: var(--dojo-tok-string);
+  --jp-mirror-editor-string-2-color: var(--dojo-tok-string);
+  --jp-mirror-editor-meta-color: var(--dojo-tok-keyword);
+  --jp-mirror-editor-qualifier-color: var(--dojo-tok-def);
+  --jp-mirror-editor-builtin-color: var(--dojo-accent);
+  --jp-mirror-editor-bracket-color: var(--dojo-muted);
+  --jp-mirror-editor-tag-color: var(--dojo-tok-keyword);
+  --jp-mirror-editor-attribute-color: var(--dojo-tok-def);
+  --jp-mirror-editor-header-color: var(--dojo-accent);
+  --jp-mirror-editor-quote-color: var(--dojo-pass);
+  --jp-mirror-editor-link-color: var(--dojo-accent);
+  --jp-mirror-editor-error-color: var(--dojo-fail);
+  --jp-mirror-editor-hr-color: var(--dojo-rule);
+  background: var(--dojo-bg);
+  color: var(--dojo-fg);
+}
+
+body.dojo-browser-gym ::selection {
+  background: var(--dojo-selection);
+}
+
+/* ---------- shell: one quiet page ---------- */
+
+.dojo-browser-gym #jp-main-dock-panel,
+.dojo-browser-gym .jp-NotebookPanel,
+.dojo-browser-gym .jp-NotebookPanel .jp-Notebook {
+  background: var(--dojo-bg);
+}
+
+/* Padding on the notebook's scroll container would clip its last screenful. */
+.dojo-browser-gym .jp-NotebookPanel .jp-Notebook {
+  padding: 0;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-WindowedPanel-viewport {
+  margin-inline: auto;
+  max-width: 1060px;
+  padding: 28px clamp(8px, 3vw, 40px) 96px;
+}
+
+.dojo-browser-gym .jp-Notebook .jp-Cell .jp-Collapser {
+  border-radius: 2px;
+}
+
+.dojo-browser-gym .jp-Notebook .jp-Cell.jp-mod-active .jp-Collapser {
+  background: var(--dojo-accent);
+}
+
+.dojo-browser-gym .jp-Notebook .jp-Cell.jp-mod-selected {
+  background: transparent;
+}
+
+/* ---------- rendered prose ---------- */
+
+.dojo-browser-gym .jp-RenderedHTMLCommon {
+  color: var(--dojo-fg);
+  font-family: var(--dojo-serif);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon h1,
+.dojo-browser-gym .jp-RenderedHTMLCommon h2,
+.dojo-browser-gym .jp-RenderedHTMLCommon h3 {
+  color: var(--dojo-fg);
+  font-family: var(--dojo-serif);
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-MarkdownCell h1 {
+  font-size: clamp(28px, 2.6vw, 36px);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0 0 16px;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-MarkdownCell h3 {
+  color: var(--dojo-accent);
+  font-size: 20px;
+  margin: 20px 0 8px;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-MarkdownCell:has(h1) .jp-RenderedHTMLCommon {
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 12px;
+  box-shadow: var(--dojo-shadow);
+  padding: clamp(20px, 3vw, 40px);
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-RenderedHTMLCommon p {
+  font-size: 17px;
+  line-height: 1.65;
+  max-width: 68ch;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-MarkdownCell:has(h1) .jp-RenderedHTMLCommon p {
+  color: var(--dojo-fg);
+  margin-block: 0 0.8em;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon a {
+  color: var(--dojo-accent);
+  text-underline-offset: 3px;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon code {
+  background: var(--dojo-accent-soft);
+  border: 0;
+  border-radius: 4px;
+  color: var(--dojo-fg);
+  font-family: var(--dojo-mono);
+  font-size: 0.82em;
+  overflow-wrap: anywhere;
+  padding: 0.08em 0.35em;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon pre {
+  background: var(--dojo-code-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  color: var(--dojo-code-fg);
+  font-family: var(--dojo-mono);
+  overflow-x: auto;
+  padding: 14px 16px;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon table {
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage {
+  border-left: 2px solid var(--dojo-rule);
+  margin-block: 14px;
+  padding: 2px 0 2px 18px;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage h3,
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage summary {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage summary {
+  cursor: pointer;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage p {
+  margin: 6px 0 0;
+}
+
+/* Structured briefs: goal first, typed callouts, and each stage's contract. */
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-goal {
+  border-bottom: 1px solid var(--dojo-rule);
+  font-size: 19px;
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-goal p {
+  font-size: 19px;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-goal h4,
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-predict h4,
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-watch-out h4,
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-why > summary {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-predict,
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-watch-out,
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-why {
+  border-left: 2px solid var(--dojo-rule);
+  margin: 12px 0;
+  padding: 2px 0 2px 16px;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-predict {
+  border-left-color: var(--dojo-accent);
+}
+
+/* A trap the workout is built to catch. */
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-watch-out {
+  border-left-color: var(--dojo-seal);
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-watch-out h4 {
+  color: var(--dojo-seal);
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-why > summary {
+  cursor: pointer;
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-brief-why p {
+  color: var(--dojo-muted);
+}
+
+.dojo-browser-gym .jp-RenderedHTMLCommon .dojo-math-display {
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage[class*="dojo-stage-"] {
+  border-left: 0;
+  border-top: 1px solid var(--dojo-rule);
+  margin-block: 18px 0;
+  padding: 14px 0 0;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-brief-stage[class*="dojo-stage-"] > h3 {
+  align-items: baseline;
+  color: var(--dojo-fg);
+  display: flex;
+  font-family: var(--dojo-serif);
+  font-size: 20px;
+  font-weight: 500;
+  gap: 10px;
+  letter-spacing: 0;
+  margin: 0 0 6px;
+  text-transform: none;
+}
+
+.dojo-browser-gym .dojo-brief-stage[data-state="current"] > h3 {
+  color: var(--dojo-accent);
+}
+
+.dojo-browser-gym .dojo-brief-stage[data-state="later"] {
+  opacity: 0.55;
+}
+
+.dojo-browser-gym .dojo-stage-badge {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+}
+
+.dojo-browser-gym .dojo-brief-stage[data-state="passed"] .dojo-stage-badge {
+  color: var(--dojo-seal);
+}
+
+.dojo-gym-ui .dojo-brief-footer,
+.dojo-brief-footer {
+  align-items: center;
+  color: var(--dojo-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 15px;
+  gap: 8px;
+  margin: 12px 0 4px 64px;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .dojo-math {
+  color: var(--dojo-fg);
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+
+/* ---------- code cells and outputs ---------- */
+
+.dojo-browser-gym .jp-NotebookPanel .jp-CodeCell .jp-Cell-inputWrapper {
+  background: var(--dojo-code-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-CodeCell.jp-mod-active .jp-Cell-inputWrapper {
+  border-color: var(--dojo-accent);
+}
+
+.dojo-browser-gym .jp-NotebookPanel .jp-InputArea-editor {
+  background: var(--dojo-code-bg);
+  border: 0;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .cm-editor {
+  font-family: var(--dojo-mono);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.dojo-browser-gym .jp-NotebookPanel .cm-gutters {
+  background: var(--dojo-code-bg);
+  border-right: 1px solid var(--dojo-rule);
+  color: var(--dojo-faint);
+}
+
+.dojo-browser-gym .jp-OutputArea-output pre {
+  color: var(--dojo-code-fg);
+  font-family: var(--dojo-mono);
+}
+
+.dojo-browser-gym .jp-InputPrompt,
+.dojo-browser-gym .jp-OutputPrompt {
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+}
+
+/* ---------- gym panels ---------- */
+
+.dojo-gym-ui {
+  box-sizing: border-box;
+  color: var(--dojo-fg);
+  font-family: var(--dojo-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.dojo-gym-ui * {
+  box-sizing: border-box;
+}
+
+/* Every control shows where keyboard focus is, on the Bench, the home page and
+   the switcher. Specific enough to beat JupyterLab's own outline resets, while
+   component rules (squares, the switcher field) can still refine it. Editors
+   and notebook containers show focus their own way. */
+body.dojo-browser-gym :focus-visible:where(:not(.cm-content, .jp-Notebook, .jp-Cell, .jp-WindowedPanel-outer, dialog)) {
+  border-radius: 4px;
+  outline: 2px solid var(--dojo-accent);
+  outline-offset: 2px;
+}
+
+/* A notebook cell reached by Tab (the brief, a drill, an explore panel) gets
+   the same ring; JupyterLab's command-mode cell rule would otherwise drop it. */
+.dojo-gym-ui.dojo-bench .jp-Notebook .jp-Cell.jp-Notebook-cell:focus-visible {
+  outline: 2px solid var(--dojo-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- the Bench: rail · problem · answer ---------- */
+
+.dojo-gym-ui.dojo-bench {
+  background: var(--dojo-bg);
+  display: grid;
+  gap: 0;
+  grid-template-columns: 216px minmax(0, 1fr) minmax(0, 1fr);
+  height: 100%;
+}
+
+/* Expanded: the answer takes the page beside the rail. */
+@media (min-width: 1100px) {
+  .dojo-gym-ui.dojo-bench.dojo-answer-expanded {
+    grid-template-columns: 216px minmax(0, 1fr);
+  }
+}
+
+.dojo-gym-ui .dojo-expand-toggle {
+  margin-left: auto;
+}
+
+.dojo-bench.dojo-answer-expanded .dojo-bench-answer .jp-NotebookPanel .jp-WindowedPanel-viewport {
+  max-width: 1280px;
+}
+
+/* The answer editor always has room to write in, and much more when expanded. */
+.dojo-bench .dojo-answer-cell .cm-content {
+  min-height: 14rem;
+}
+
+.dojo-bench.dojo-answer-expanded .dojo-answer-cell .cm-content {
+  min-height: 60vh;
+}
+
+.dojo-gym-ui .dojo-scratch-controls {
+  margin-top: 4px;
+}
+
+.dojo-gym-ui .dojo-scratch-run[hidden],
+.dojo-gym-ui .dojo-scratch-note[hidden],
+.dojo-gym-ui .dojo-shortcuts[hidden] {
+  display: none;
+}
+
+.dojo-gym-ui .dojo-shortcuts-toggle {
+  margin-left: auto;
+}
+
+.dojo-gym-ui .dojo-scratch-note {
+  color: var(--dojo-muted);
+  font-size: 0.9rem;
+  margin: 6px 0 0;
+  max-width: 60ch;
+}
+
+.dojo-gym-ui .dojo-shortcuts {
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px 16px;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 8px 0 0;
+  padding: 12px 14px;
+}
+
+.dojo-gym-ui .dojo-shortcuts dt {
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dojo-gym-ui .dojo-shortcuts dd {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.dojo-gym-ui .dojo-shortcuts .dojo-emacs-toggle {
+  border-top: 1px solid var(--dojo-rule);
+  color: var(--dojo-fg);
+  display: block;
+  font-family: var(--dojo-serif);
+  font-size: 0.9rem;
+  grid-column: 1 / -1;
+  padding-top: 8px;
+}
+
+.dojo-gym-ui .dojo-shortcuts kbd {
+  background: var(--dojo-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+.dojo-bench-rail {
+  border-right: 1px solid var(--dojo-rule);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 16px;
+}
+
+.dojo-bench-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.dojo-bench-answer {
+  background: var(--dojo-slate);
+  border-left: 1px solid var(--dojo-rule);
+}
+
+.dojo-bench-viewhost {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+.dojo-bench-viewhost > .jp-NotebookPanel {
+  inset: 0;
+  position: absolute;
+}
+
+.dojo-bench .jp-NotebookPanel,
+.dojo-bench .jp-NotebookPanel .jp-Notebook {
+  background: transparent;
+}
+
+.dojo-bench .jp-MarkdownCell .jp-InputPrompt {
+  display: none;
+}
+
+.dojo-bench .jp-NotebookPanel .jp-WindowedPanel-viewport {
+  max-width: 760px;
+  padding: 16px clamp(8px, 2vw, 28px) 64px;
+}
+
+.dojo-problem-header,
+.dojo-answer-header {
+  border-bottom: 1px solid var(--dojo-rule);
+  flex: none;
+  padding: 16px clamp(12px, 2vw, 28px) 0;
+}
+
+.dojo-problem-identity {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+}
+
+.dojo-workout-id {
+  color: var(--dojo-accent);
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+}
+
+.dojo-problem-identity h1 {
+  font-family: var(--dojo-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.dojo-problem-header .dojo-concepts {
+  margin-top: 4px;
+}
+
+.dojo-tablist {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.dojo-gym-ui .dojo-tablist [role="tab"] {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--dojo-muted);
+  font-family: var(--dojo-serif);
+  font-size: 16px;
+  min-height: 38px;
+  padding: 6px 12px;
+}
+
+.dojo-gym-ui .dojo-tablist [role="tab"][aria-selected="true"] {
+  border-bottom-color: var(--dojo-accent);
+  color: var(--dojo-fg);
+}
+
+.dojo-gym-ui .dojo-tablist [role="tab"]:hover {
+  color: var(--dojo-fg);
+}
+
+.dojo-tab-count {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+}
+
+.dojo-bench-reps {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px clamp(12px, 2vw, 28px) 48px;
+}
+
+.dojo-answer-header {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: space-between;
+  padding-bottom: 12px;
+}
+
+.dojo-answer-label h2 {
+  font-family: var(--dojo-serif);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.dojo-answer-label p {
+  color: var(--dojo-muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.dojo-answer-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dojo-gym-ui .dojo-answer-actions .dojo-primary-button {
+  margin: 0;
+  width: auto;
+}
+
+.dojo-gym-ui .dojo-answer-actions .dojo-stage-label {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.dojo-gym-ui .dojo-answer-actions select {
+  margin: 0;
+  width: auto;
+}
+
+/* rail */
+.dojo-gym-ui .dojo-eyebrow {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dojo-gym-ui .dojo-concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.dojo-gym-ui .dojo-concepts:empty {
+  display: none;
+}
+
+.dojo-gym-ui .dojo-concepts span {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+}
+
+.dojo-seals {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dojo-seal-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.dojo-seal {
+  border: 1.5px dashed var(--dojo-rule);
+  border-radius: 50%;
+  color: var(--dojo-faint);
+  display: grid;
+  flex: none;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 600;
+  height: 30px;
+  place-items: center;
+  width: 30px;
+}
+
+.dojo-seal-label {
+  color: var(--dojo-muted);
+  font-size: 15px;
+}
+
+.dojo-seal-row[data-state="current"] .dojo-seal {
+  border-color: var(--dojo-accent);
+  border-style: solid;
+  color: var(--dojo-accent);
+}
+
+.dojo-seal-row[data-state="current"] .dojo-seal-label {
+  color: var(--dojo-fg);
+}
+
+.dojo-seal-row[data-state="passed"] .dojo-seal {
+  background: color-mix(in srgb, var(--dojo-seal) 10%, transparent);
+  border: 2px solid var(--dojo-seal);
+  color: var(--dojo-seal);
+  transform: rotate(-8deg);
+}
+
+.dojo-seal-text {
+  display: grid;
+  line-height: 1.25;
+}
+
+.dojo-seal-times {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dojo-seal-times[data-trend="faster"] {
+  color: var(--dojo-pass);
+}
+
+.dojo-seal-times[data-trend="slower"] {
+  color: var(--dojo-fail);
+}
+
+/* A passed stage is stamped once, like an ink seal. */
+.dojo-seal.dojo-stamping {
+  animation: dojo-stamp 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+@keyframes dojo-stamp {
+  0% { opacity: 0; transform: scale(1.9) rotate(-20deg); }
+  60% { opacity: 1; }
+  100% { transform: scale(1) rotate(-8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dojo-seal.dojo-stamping {
+    animation: none;
+  }
+}
+
+.dojo-timer {
+  align-items: center;
+  color: var(--dojo-muted);
+  display: flex;
+  font-family: var(--dojo-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  gap: 8px;
+  opacity: 0.75;
+}
+
+.dojo-timer[data-paused="true"] .dojo-timer-value,
+.dojo-timer[data-final="true"] .dojo-timer-value {
+  color: var(--dojo-faint);
+}
+
+.dojo-gym-ui .dojo-timer-toggle {
+  background: transparent;
+  border-color: transparent;
+  color: var(--dojo-faint);
+  font-size: 10px;
+  min-height: 22px;
+  padding: 2px 6px;
+}
+
+.dojo-rep-summary {
+  border-left: 2px solid var(--dojo-seal);
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 10px;
+}
+
+.dojo-rep-summary[hidden] {
+  display: none;
+}
+
+.dojo-rep-summary a {
+  color: var(--dojo-accent);
+  display: block;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.dojo-rep-table {
+  border-collapse: collapse;
+  font-family: var(--dojo-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  margin: 14px 0;
+  width: 100%;
+}
+
+.dojo-rep-table caption {
+  color: var(--dojo-faint);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding-bottom: 6px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.dojo-rep-table th,
+.dojo-rep-table td {
+  border-bottom: 1px solid var(--dojo-rule);
+  font-weight: 400;
+  padding: 5px 10px 5px 0;
+  text-align: left;
+}
+
+.dojo-rep-table thead th {
+  color: var(--dojo-faint);
+}
+
+.dojo-rep-table tr[data-best="true"] th,
+.dojo-rep-table tr[data-best="true"] td {
+  color: var(--dojo-accent);
+}
+
+.dojo-rep-table tr[data-current="true"] th {
+  font-weight: 600;
+}
+
+.dojo-rail-controls {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  margin-top: auto;
+}
+
+.dojo-rail-controls .dojo-kernel-actions {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  margin: 0;
+}
+
+.dojo-gym-ui .dojo-kernel-status {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  padding-inline: 4px;
+  white-space: nowrap;
+}
+
+.dojo-gym-ui .dojo-theme-toggle {
+  font-size: 15px;
+  min-width: 34px;
+}
+
+/* The brief's own title repeats the workout header above the tabs, so it is
+   kept for screen readers only. */
+.dojo-gym-ui.dojo-bench .jp-MarkdownCell .jp-RenderedMarkdown > h1:first-child {
+  clip-path: inset(50%);
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* drill cards: predict, run, compare, then read why */
+.dojo-drill-card {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.dojo-drill-card h3 {
+  font-family: var(--dojo-serif);
+  font-size: 19px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.dojo-drill-prompt p {
+  margin: 0;
+}
+
+.dojo-gym-ui .dojo-drill-card textarea {
+  min-height: 0;
+}
+
+.dojo-drill-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.dojo-bench .dojo-drill-cell {
+  border-top: 1px solid var(--dojo-rule);
+  padding-top: 16px;
+}
+
+.dojo-bench .dojo-drill-cell .jp-InputPrompt,
+.dojo-bench .dojo-drill-cell .jp-OutputPrompt,
+.dojo-bench .dojo-drill-cell .jp-OutputArea-promptOverlay {
+  display: none;
+}
+
+.dojo-drill-reasoning {
+  border-left: 2px solid var(--dojo-accent);
+  color: var(--dojo-muted);
+  margin: 8px 0 4px;
+  padding: 2px 0 2px 14px;
+}
+
+.dojo-drill-reasoning[hidden] {
+  display: none;
+}
+
+/* explore panels: output first, code on request */
+.dojo-explore-controls {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin: 0 0 6px;
+}
+
+/* Explore panels: the lessons draw neutral strokes and fills as SVG
+   attributes, which can't take tokens, so the page restyles them. */
+.dojo-explore-cell :is([stroke='#374151'], [stroke='#111827']) {
+  stroke: var(--dojo-muted);
+}
+
+.dojo-explore-cell :is([fill='#111827'], [fill='#374151']) {
+  fill: var(--dojo-fg);
+}
+
+.dojo-explore-cell :is([stroke='#d1d5db'], [stroke='#9ca3af']) {
+  stroke: var(--dojo-rule);
+}
+
+.dojo-explore-cell [fill='#d1d5db'] {
+  fill: var(--dojo-rule);
+}
+
+.dojo-explore-cell [fill='#f9fafb'] {
+  fill: var(--dojo-bg);
+}
+
+.dojo-explore-cell svg text:not([fill]) {
+  fill: var(--dojo-fg);
+}
+
+.dojo-explore-cell [fill='#dcfce7'] {
+  fill: var(--dojo-pass-soft);
+}
+
+.dojo-explore-cell [fill='#bfdbfe'] {
+  fill: var(--dojo-accent-soft);
+}
+
+.dojo-explore-cell :is([fill='#134e4a'], [fill='#115e59']) {
+  fill: var(--dojo-accent);
+}
+
+.dojo-explore-cell :is([stroke='#134e4a'], [stroke='#115e59']) {
+  stroke: var(--dojo-accent);
+}
+
+.dojo-explore-cell [stroke='#7f1d1d'] {
+  stroke: var(--dojo-fail);
+}
+
+.dojo-explore-cell :is(input, select, button:not(.dojo-explore-controls button)) {
+  background-color: var(--dojo-surface);
+  color: var(--dojo-fg);
+  accent-color: var(--dojo-accent);
+}
+
+.dojo-bench .dojo-explore-cell .jp-InputPlaceholder,
+.dojo-bench .dojo-explore-cell.jp-mod-noInput .jp-InputPrompt,
+.dojo-bench .dojo-explore-cell .jp-OutputPrompt,
+.dojo-bench .dojo-explore-cell .jp-OutputArea-promptOverlay {
+  display: none;
+}
+
+
+/* learning path drawer */
+.dojo-gym-ui .dojo-path-card[hidden] {
+  display: none;
+}
+
+.dojo-gym-ui .dojo-path-card {
+  border-top: 1px solid var(--dojo-rule);
+  padding-top: 10px;
+}
+
+.dojo-gym-ui .dojo-path-card nav strong {
+  color: var(--dojo-faint);
+  display: block;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.dojo-gym-ui .dojo-path-card [role="list"] {
+  display: grid;
+  gap: 2px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.dojo-gym-ui .dojo-path-card [role="listitem"] {
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.dojo-gym-ui .dojo-path-card [role="listitem"]:has([aria-current="page"]) {
+  background: var(--dojo-accent-soft);
+}
+
+.dojo-gym-ui .dojo-path-card a {
+  color: var(--dojo-accent);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.dojo-gym-ui .dojo-path-card a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dojo-gym-ui .dojo-path-card [role="listitem"] span {
+  color: var(--dojo-faint);
+  display: block;
+  font-family: var(--dojo-mono);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.dojo-gym-ui [data-testid="dojo-next-exercise"] {
+  color: var(--dojo-accent);
+  display: inline-block;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  margin-top: 8px;
+  text-decoration: none;
+}
+
+/* inline check panel under the answer cell */
+#torch-dojo-gym {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 12px;
+}
+
+.dojo-gym-ui .dojo-card {
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 10px;
+  margin: 0;
+  min-width: 0;
+  padding: 14px 16px;
+}
+
+.dojo-gym-ui .dojo-card-heading {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.dojo-gym-ui .dojo-attempt-card > summary,
+.dojo-gym-ui .dojo-feedback-card summary {
+  color: var(--dojo-muted);
+  cursor: pointer;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+}
+
+.dojo-gym-ui .dojo-attempt-card[open] > summary {
+  margin-bottom: 12px;
+}
+
+/* controls: one button language */
+.dojo-gym-ui button {
+  align-items: center;
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  color: var(--dojo-fg);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  gap: 6px;
+  justify-content: center;
+  line-height: 1.2;
+  min-height: 32px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.dojo-gym-ui button:hover:not(:disabled) {
+  border-color: var(--dojo-faint);
+}
+
+.dojo-gym-ui button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.dojo-gym-ui .dojo-primary-button {
+  background: var(--dojo-accent);
+  border-color: var(--dojo-accent);
+  color: var(--dojo-on-accent);
+  font-weight: 600;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.dojo-gym-ui .dojo-primary-button:hover:not(:disabled) {
+  border-color: var(--dojo-accent);
+  filter: brightness(1.08);
+}
+
+.dojo-gym-ui .dojo-stop-button:not(:disabled) {
+  border-color: var(--dojo-fail);
+  color: var(--dojo-fail);
+}
+
+.dojo-gym-ui .dojo-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.dojo-gym-ui .dojo-kernel-actions button,
+.dojo-gym-ui .dojo-theme-toggle {
+  background: transparent;
+  border-color: transparent;
+  color: var(--dojo-muted);
+}
+
+.dojo-gym-ui .dojo-kernel-actions button:hover:not(:disabled),
+.dojo-gym-ui .dojo-theme-toggle:hover {
+  border-color: var(--dojo-rule);
+  color: var(--dojo-fg);
+}
+
+.dojo-gym-ui label {
+  color: var(--dojo-muted);
+  display: block;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.dojo-gym-ui select,
+.dojo-gym-ui textarea,
+.dojo-gym-ui input[type="file"] {
+  background: var(--dojo-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  color: var(--dojo-fg);
+  display: block;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  margin-top: 6px;
+  max-width: 100%;
+  width: 100%;
+}
+
+.dojo-gym-ui select {
+  height: 34px;
+  margin-bottom: 10px;
+  padding: 0 8px;
+}
+
+.dojo-gym-ui textarea {
+  line-height: 1.5;
+  min-height: 82px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+
+.dojo-gym-ui #torch-dojo-notes {
+  margin-bottom: 10px;
+}
+
+.dojo-gym-ui input[type="file"] {
+  font-size: 11px;
+  padding: 6px;
+}
+
+.dojo-gym-ui input[type="file"]::file-selector-button {
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 6px;
+  color: var(--dojo-fg);
+  cursor: pointer;
+  font: inherit;
+  margin-right: 8px;
+  padding: 4px 8px;
+}
+
+/* help, rep log, receipts */
+.dojo-gym-ui .dojo-help-card ol {
+  border-left: 2px solid var(--dojo-accent);
+  font-size: 16px;
+  line-height: 1.55;
+  margin: 10px 0 0;
+  padding: 2px 0 2px 32px;
+}
+
+.dojo-gym-ui .dojo-help-card pre {
+  background: var(--dojo-code-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  color: var(--dojo-code-fg);
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 10px 0 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
+.dojo-gym-ui [data-testid="dojo-attempt-history"] {
+  border-top: 1px solid var(--dojo-rule);
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 12px;
+  max-height: 200px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding-top: 10px;
+}
+
+.dojo-gym-ui [data-testid="dojo-attempt-history"] button {
+  font-size: 11px;
+  min-height: 26px;
+  padding: 3px 8px;
+}
+
+.dojo-gym-ui .dojo-feedback-card [role="status"] {
+  color: var(--dojo-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.dojo-gym-ui .dojo-report-headline {
+  color: var(--dojo-fg);
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.dojo-gym-ui .dojo-technical-log {
+  font: 11px/1.6 var(--dojo-mono);
+  margin-top: 10px;
+  max-height: 230px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* ---------- check results: one square per verifier ---------- */
+
+#torch-dojo-gym .dojo-verifier-grid {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dojo-grid-quiet {
+  color: var(--dojo-muted);
+  font-size: 15px;
+  margin: 0;
+}
+
+.dojo-grid-running {
+  align-items: center;
+  display: flex;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  gap: 8px;
+}
+
+.dojo-spinner {
+  animation: dojo-spin 0.8s linear infinite;
+  border: 2px solid var(--dojo-rule);
+  border-radius: 50%;
+  border-top-color: var(--dojo-accent);
+  height: 12px;
+  width: 12px;
+}
+
+@keyframes dojo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.dojo-square-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.dojo-square-heading {
+  color: var(--dojo-faint);
+  display: flex;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  gap: 8px;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.dojo-square-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dojo-gym-ui .dojo-square {
+  border: 1.5px solid var(--dojo-faint);
+  border-radius: 4px;
+  display: inline-block;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  width: 22px;
+}
+
+.dojo-gym-ui .dojo-square[data-state="pass"] {
+  background: var(--dojo-pass);
+  border-color: var(--dojo-pass);
+}
+
+.dojo-gym-ui .dojo-square[data-state="fail"] {
+  background: var(--dojo-fail);
+  border-color: var(--dojo-fail);
+}
+
+.dojo-gym-ui .dojo-square[data-state="not-run"] {
+  background: transparent;
+}
+
+.dojo-gym-ui .dojo-square[data-state="locked"] {
+  background: repeating-linear-gradient(135deg, var(--dojo-rule) 0 2px, transparent 2px 5px);
+  border-color: var(--dojo-rule);
+}
+
+.dojo-gym-ui .dojo-square[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--dojo-bg), 0 0 0 4px var(--dojo-fg);
+}
+
+.dojo-gym-ui .dojo-square:focus-visible {
+  outline: 2px solid var(--dojo-accent);
+  outline-offset: 5px;
+}
+
+.dojo-verifier-detail {
+  background: var(--dojo-surface);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.dojo-verifier-detail[hidden] {
+  display: none;
+}
+
+.dojo-detail-title {
+  font-family: var(--dojo-mono);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dojo-detail-meta {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  margin: 2px 0 8px;
+}
+
+.dojo-readout {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  margin: 0;
+}
+
+.dojo-readout:empty {
+  display: none;
+}
+
+.dojo-case-totals,
+.dojo-case-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dojo-case-toolbar { margin: 14px 0; }
+
+.dojo-badge {
+  border-radius: 6px;
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.dojo-pass { background: var(--dojo-pass-soft); color: var(--dojo-pass); }
+.dojo-fail { background: var(--dojo-fail-soft); color: var(--dojo-fail); }
+.dojo-stale { background: var(--dojo-warn-soft); color: var(--dojo-warn); }
+
+.dojo-case-caption,
+.dojo-case-empty {
+  color: var(--dojo-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.dojo-case-empty { padding: 4px 0; }
+
+.dojo-sample { border-top: 1px solid var(--dojo-rule); padding: 14px; }
+
+.dojo-sample-title {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.dojo-sample-grid { display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.dojo-sample-column {
+  background: var(--dojo-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.dojo-sample-column h4 {
+  color: var(--dojo-faint);
+  font-family: var(--dojo-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin: 0;
+  padding: 8px 10px 0;
+  text-transform: uppercase;
+}
+
+.dojo-sample-column pre,
+.dojo-case-evidence {
+  color: var(--dojo-code-fg);
+  font: 11px/1.6 var(--dojo-mono);
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+.dojo-case-error {
+  background: var(--dojo-fail-soft);
+  border-radius: 6px;
+  color: var(--dojo-fail);
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  margin: 10px 12px;
+  overflow-wrap: anywhere;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 900px) {
+  .dojo-sample-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Below 1100px the Bench stacks: rail, then problem, then answer, in one scroll. */
+@media (max-width: 1099px) {
+  .dojo-gym-ui.dojo-bench {
+    display: block;
+    overflow-y: auto;
+  }
+
+  .dojo-bench-rail {
+    border-bottom: 1px solid var(--dojo-rule);
+    border-right: 0;
+    flex-flow: row wrap;
+    overflow: visible;
+  }
+
+  .dojo-seals {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .dojo-rail-controls {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0;
+  }
+
+  .dojo-rail-controls .dojo-kernel-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .dojo-bench-problem {
+    height: 75vh;
+  }
+
+  .dojo-bench-answer {
+    border-left: 0;
+    border-top: 1px solid var(--dojo-rule);
+    height: 90vh;
+  }
+}
+
+@media (max-width: 720px) {
+  .dojo-browser-gym .jp-NotebookPanel .jp-WindowedPanel-viewport {
+    padding: 12px 4px 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dojo-gym-ui *,
+  .dojo-browser-gym .jp-Notebook * {
+    transition: none !important;
+  }
+}
+
+/* Home page: one calm column of topics, Next up first. */
+.dojo-home {
+  overflow-y: auto;
+  background: var(--dojo-bg);
+  color: var(--dojo-fg);
+  font-family: var(--dojo-serif);
+}
+
+.dojo-home-page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.dojo-home-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 0.25rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.dojo-home-header .dojo-eyebrow,
+.dojo-home-header .dojo-home-tip {
+  grid-column: 1 / -1;
+}
+
+.dojo-home-header .dojo-theme-toggle {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+}
+
+.dojo-home-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.dojo-home-tip {
+  margin: 0;
+  color: var(--dojo-muted);
+  font-size: 0.95rem;
+}
+
+.dojo-home-next {
+  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--dojo-rule);
+  border-left: 3px solid var(--dojo-accent);
+  border-radius: 6px;
+  background: var(--dojo-surface);
+}
+
+.dojo-home-next h2,
+.dojo-home-topic h2 {
+  margin: 0 0 0.5rem;
+  color: var(--dojo-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dojo-home-next a {
+  font-size: 1.3rem;
+}
+
+.dojo-home-next p {
+  margin: 0.35rem 0 0;
+  color: var(--dojo-muted);
+}
+
+.dojo-home-topic {
+  margin-bottom: 2rem;
+}
+
+.dojo-home-topic ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--dojo-rule);
+}
+
+.dojo-home-topic li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--dojo-rule);
+}
+
+.dojo-home a,
+.dojo-home-link {
+  color: var(--dojo-accent);
+  text-decoration: none;
+}
+
+.dojo-home a:hover,
+.dojo-home-link:hover {
+  text-decoration: underline;
+}
+
+.dojo-home-stats {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 0.8rem;
+}
+
+/* ⌘K switcher */
+.dojo-switcher {
+  width: min(36rem, calc(100vw - 2rem));
+  margin-top: 12vh;
+  padding: 0;
+  border: 1px solid var(--dojo-rule);
+  border-radius: 8px;
+  background: var(--dojo-surface);
+  color: var(--dojo-fg);
+  box-shadow: var(--dojo-shadow);
+  font-family: var(--dojo-serif);
+}
+
+.dojo-switcher::backdrop {
+  background: rgb(0 0 0 / 25%);
+}
+
+.dojo-switcher input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--dojo-rule);
+  background: transparent;
+  color: var(--dojo-fg);
+  font: inherit;
+  font-size: 1.05rem;
+  outline: none;
+}
+
+.dojo-switcher input:focus-visible {
+  box-shadow: inset 0 -2px 0 var(--dojo-accent);
+}
+
+.dojo-switcher ul {
+  max-height: 50vh;
+  margin: 0;
+  padding: 0.35rem 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.dojo-switcher li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+}
+
+.dojo-switcher li[aria-selected='true'] {
+  background: var(--dojo-accent-soft);
+}
+
+.dojo-switcher-since,
+.dojo-switcher-empty {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 0.8rem;
+}
+
+/* A lab pass that leaned on a reference component says so beside the verifier. */
+.dojo-detail-substitution {
+  margin: 0.4rem 0;
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid var(--dojo-warn);
+  background: var(--dojo-warn-soft);
+  color: var(--dojo-fg);
+  font-size: 0.9rem;
+}
+
+/* Failure detail: where it failed, the failing example, the check's variables. */
+.dojo-verifier-detail .dojo-detail-heading {
+  color: var(--dojo-muted);
+  font-family: var(--dojo-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  margin: 14px 0 6px;
+  text-transform: uppercase;
+}
+
+.dojo-failure-place {
+  margin: 0 0 10px;
+}
+
+.dojo-failure-place figcaption {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.dojo-failure-code {
+  background: var(--dojo-code-bg);
+  border: 1px solid var(--dojo-rule);
+  border-radius: 6px;
+  color: var(--dojo-code-fg);
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  overflow-x: auto;
+  padding: 6px 0;
+}
+
+.dojo-failure-line {
+  display: block;
+  padding: 0 10px;
+  white-space: pre;
+}
+
+.dojo-failing-line {
+  background: var(--dojo-fail-soft);
+  box-shadow: inset 3px 0 0 var(--dojo-fail);
+}
+
+.dojo-failing-example .dojo-sample {
+  border-color: var(--dojo-fail);
+}
+
+.dojo-check-variables dl {
+  display: grid;
+  font-family: var(--dojo-mono);
+  font-size: 12px;
+  gap: 4px 12px;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 0;
+}
+
+.dojo-check-variables dd {
+  margin: 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.dojo-earlier-calls {
+  margin-top: 10px;
+}
+
+.dojo-earlier-calls summary {
+  color: var(--dojo-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Recall uses the same quiet page as workouts, with no timer or score. */
+.dojo-motifs { margin: 1.5rem 0 2rem; padding: 1.25rem; border: 1px solid var(--jp-border-color2); border-radius: 12px; }
+.dojo-motif-actions { display: flex; gap: .6rem; flex-wrap: wrap; margin: .8rem 0; }
+.dojo-motifs button { cursor: pointer; padding: .45rem .7rem; }
+.dojo-motif-card { margin: 1rem 0; }
+.dojo-motif-card pre { overflow-x: auto; padding: 1rem; background: var(--jp-layout-color2); border-radius: 6px; white-space: pre; }
+.dojo-motifs summary { cursor: pointer; padding: .5rem 0; }
+.dojo-motifs input[type=search] { box-sizing: border-box; width: 100%; padding: .6rem; margin: .6rem 0; }
+.dojo-motifs li { margin: .6rem 0; }
+.dojo-motifs li span { color: var(--jp-ui-font-color2); }
+.dojo-gym-ui .dojo-motifs [hidden] { display: none; }

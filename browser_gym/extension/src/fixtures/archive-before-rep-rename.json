@@ -1,0 +1,83 @@
+{
+  "format": "torch-dojo.browser-gym.attempts",
+  "version": 1,
+  "exportedAt": "2026-10-09T06:33:01.055Z",
+  "activeByExercise": {
+    "0059": "attempt-pre-rename"
+  },
+  "attempts": [
+    {
+      "id": "attempt-pre-rename",
+      "exerciseId": "0059",
+      "createdAt": "2026-10-09T06:33:01.051Z",
+      "updatedAt": "2026-10-09T06:33:01.053Z",
+      "notebookPath": "attempts/0059/attempt-pre-rename.ipynb",
+      "notebook": {
+        "metadata": {
+          "dojo": {
+            "exercise_id": "0059"
+          }
+        },
+        "cells": [
+          {
+            "cell_type": "markdown",
+            "source": "Prompt"
+          },
+          {
+            "cell_type": "code",
+            "source": "import numpy as np\n\ndef answer():\n    return 1\n",
+            "metadata": {
+              "dojo": {
+                "role": "solution",
+                "exercise_id": "0059"
+              }
+            }
+          }
+        ]
+      },
+      "notes": "notes written before the rep rename",
+      "assistance": [],
+      "receipts": [
+        {
+          "id": "receipt-pre-rename",
+          "exerciseId": "0059",
+          "checkedAt": "2026-10-06T00:00:00.000Z",
+          "source": "import numpy as np\n\ndef answer():\n    return 1\n",
+          "sha256": "a1c90121714ceec89453f7eb493ccf9dd439b11e146c97cd91832e946a62afa8",
+          "sourceBound": [
+            1
+          ],
+          "status": "passed",
+          "checkerVersion": "checker-a",
+          "runtime": "pyodide-0.28.3",
+          "packageIdentity": {
+            "numpy": "2.1.3"
+          },
+          "fixtureId": "canonical-0059",
+          "result": {
+            "status": "passed",
+            "checks": [
+              {
+                "name": "verify_baseline",
+                "status": "passed",
+                "elapsed_ms": 1
+              }
+            ],
+            "error": null,
+            "checker_version": "checker-a",
+            "runtime": "pyodide-0.28.3",
+            "fixture_id": "canonical-0059"
+          },
+          "assistance": []
+        }
+      ]
+    }
+  ],
+  "files": {
+    "attempts/attempt-pre-rename/notebook.ipynb": "{\n  \"metadata\": {\n    \"dojo\": {\n      \"exercise_id\": \"0059\"\n    }\n  },\n  \"cells\": [\n    {\n      \"cell_type\": \"markdown\",\n      \"source\": \"Prompt\"\n    },\n    {\n      \"cell_type\": \"code\",\n      \"source\": \"import numpy as np\\n\\ndef answer():\\n    return 1\\n\",\n      \"metadata\": {\n        \"dojo\": {\n          \"role\": \"solution\",\n          \"exercise_id\": \"0059\"\n        }\n      }\n    }\n  ]\n}\n",
+    "attempts/attempt-pre-rename/solution.py": "import numpy as np\n\ndef answer():\n    return 1\n",
+    "attempts/attempt-pre-rename/notes.md": "notes written before the rep rename",
+    "attempts/attempt-pre-rename/assistance.json": "[]\n",
+    "attempts/attempt-pre-rename/receipts.json": "[\n  {\n    \"id\": \"receipt-pre-rename\",\n    \"exerciseId\": \"0059\",\n    \"checkedAt\": \"2026-10-06T00:00:00.000Z\",\n    \"source\": \"import numpy as np\\n\\ndef answer():\\n    return 1\\n\",\n    \"sha256\": \"a1c90121714ceec89453f7eb493ccf9dd439b11e146c97cd91832e946a62afa8\",\n    \"sourceBound\": [\n      1\n    ],\n    \"status\": \"passed\",\n    \"checkerVersion\": \"checker-a\",\n    \"runtime\": \"pyodide-0.28.3\",\n    \"packageIdentity\": {\n      \"numpy\": \"2.1.3\"\n    },\n    \"fixtureId\": \"canonical-0059\",\n    \"result\": {\n      \"status\": \"passed\",\n      \"checks\": [\n        {\n          \"name\": \"verify_baseline\",\n          \"status\": \"passed\",\n          \"elapsed_ms\": 1\n        }\n      ],\n      \"error\": null,\n      \"checker_version\": \"checker-a\",\n      \"runtime\": \"pyodide-0.28.3\",\n      \"fixture_id\": \"canonical-0059\"\n    },\n    \"assistance\": []\n  }\n]\n"
+  }
+}

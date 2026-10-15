@@ -1,0 +1,9 @@
+{
+  "@jupyterlab/application-extension:shell": {
+    "startMode": "single",
+    "dockPanelPadding": false
+  },
+  "@jupyterlab/notebook-extension:tracker": {
+    "windowingMode": "none"
+  }
+}
