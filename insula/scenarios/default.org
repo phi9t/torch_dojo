@@ -1,0 +1,38 @@
+#+TITLE: Torch Dojo GPU Jupyter scenario
+
+In the TUI, =F10= advances one checkpoint or Python cell. =F9= browses completed
+steps. The Emacs terminal uses =n= to advance, =p= to browse, =r= to restart,
+and =q= to clean up and exit.
+
+* Setup
+Inspect the two-insula environment and authenticated server readiness.
+
+* Connect
+Start one =torch-dojo-gpu= kernel from the Emacs insula.
+
+* Context cell
+#+NAME: context
+#+BEGIN_SRC python
+import os, sys
+print(f"executable={sys.executable}")
+print(f"cwd={os.getcwd()}")
+print(f"home={os.environ['HOME']}")
+#+END_SRC
+
+* CUDA cell
+#+NAME: cuda
+#+BEGIN_SRC python
+import torch
+x = torch.arange(1, 5, device='cuda', dtype=torch.float32)
+torch.cuda.synchronize()
+print(f"device={x.device} sum={x.sum().item()}")
+#+END_SRC
+
+* Workspace cell
+#+NAME: workspace
+#+BEGIN_SRC python
+from pathlib import Path
+workspace_file = Path('__RUN_DIR__/workspace.txt')
+workspace_file.write_text('visible from jupyter\n')
+print(f"workspace={workspace_file} value={workspace_file.read_text().strip()}")
+#+END_SRC

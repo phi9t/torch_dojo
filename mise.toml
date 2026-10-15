@@ -1,0 +1,19 @@
+[tasks.jupyter]
+description = "Start the GPU Jupyter insula and print its authenticated URL"
+dir = "{{config_root}}"
+run = "./insula/jupyter_rootfs/run_server.sh"
+
+[tasks."jupyter:token"]
+description = "Show the current Jupyter insula token"
+dir = "{{config_root}}"
+run = "cat target/insula/shared/token"
+
+[tasks."jupyter:logs"]
+description = "Follow Jupyter insula server output (Ctrl-C to stop following)"
+dir = "{{config_root}}"
+run = "tail -n 50 -f target/insula/shared/server.log"
+
+[tasks."jupyter:stop"]
+description = "Clean up kernels and stop the Jupyter insula"
+dir = "{{config_root}}"
+run = "./insula/jupyter_rootfs/stop_server.sh"

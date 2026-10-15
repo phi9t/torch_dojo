@@ -1,0 +1,28 @@
+ARG BASE_IMAGE=ghcr.io/pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime@sha256:7492928e093d67276716440161f694a0e4ea27796d599d64b23cb76cdd665e71
+FROM ${BASE_IMAGE}
+ARG DOOM_COMMIT=8b475fcb2574286d7f4413c22cc7902d80d21ced
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends emacs-nox git ripgrep fd-find curl ca-certificates libzmq5 libsqlite3-0 && rm -rf /var/lib/apt/lists/*
+RUN python -m pip install --break-system-packages --no-cache-dir 'jupyter_server==2.17.0' 'ipykernel==6.31.0' 'jupyter_client==8.6.3' 'websocket-client==1.8.0'
+RUN mkdir -p /opt/dojo/doom /opt/dojo/doom-config && git -C /opt/dojo/doom init && git -C /opt/dojo/doom remote add origin https://github.com/doomemacs/doomemacs && git -C /opt/dojo/doom fetch --depth 1 origin "${DOOM_COMMIT}" && git -C /opt/dojo/doom checkout FETCH_HEAD
+COPY insula/rootfs/doom-init.el /opt/dojo/doom-config/init.el
+COPY insula/rootfs/doom-packages.el /opt/dojo/doom-config/packages.el
+COPY insula/rootfs/doom-config.el /opt/dojo/doom-config/config.el
+RUN HOME=/opt/dojo DOOMDIR=/opt/dojo/doom-config EMACSDIR=/opt/dojo/doom /opt/dojo/doom/bin/doom sync -e -B --no-color --doomdir /opt/dojo/doom-config --emacsdir /opt/dojo/doom
+RUN python - <<'PY'
+import torch, jupyter_server, ipykernel
+assert torch.version.cuda, 'CUDA PyTorch build required'
+print(torch.__version__, torch.version.cuda)
+PY
+# CUDA compiler toolchain for the softmax workout (the runtime base has no nvcc). nvcc, cicc and
+# ptxas come from pip, all pinned to one 13.2 patch (a newer cicc emits PTX the older ptxas rejects), matching the torch CUDA tree; g++ is the host compiler nvcc needs.
+# /usr/local/cuda points at the pip CUDA tree; the capsule puts its bin on PATH and sets CUDA_HOME
+# (nvcc finds headers relative to its own path, so it must not be symlinked elsewhere).
+RUN apt-get update && apt-get install -y --no-install-recommends g++ && rm -rf /var/lib/apt/lists/*
+RUN python -m pip install --break-system-packages --no-cache-dir 'nvidia-cuda-nvcc==13.2.86' 'nvidia-nvvm==13.2.86' 'nvidia-cuda-crt==13.2.86' \
+ && cuda=$(python -c "import nvidia.cu13; print(list(nvidia.cu13.__path__)[0])") \
+ && ln -sfn "$cuda" /usr/local/cuda
+RUN printf '__global__ void k(float* x) { x[threadIdx.x] += 1.f; }\n' > /tmp/k.cu \
+ && /usr/local/cuda/bin/nvcc -arch=sm_90 -cubin /tmp/k.cu -o /tmp/k.cubin && test -s /tmp/k.cubin && rm /tmp/k.cu /tmp/k.cubin \
+ && python -c "import torch; assert torch.version.cuda"

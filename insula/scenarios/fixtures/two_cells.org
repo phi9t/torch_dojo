@@ -1,0 +1,19 @@
+#+TITLE: Two-cell CUDA notebook fixture
+
+* Prepare
+This cell establishes state for the next cell.
+#+BEGIN_SRC python
+import torch
+values = torch.arange(1, 4, device='cuda', dtype=torch.float32)
+print(f"device={values.device} count={values.numel()}")
+#+END_SRC
+
+* Reuse
+The second cell reads the first cell's variable in the same kernel.
+#+BEGIN_SRC python
+print(f"sum={values.sum().item()}")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(message "This non-Python block is skipped")
+#+END_SRC
