@@ -1,0 +1,11 @@
+session|focus|drills|minutes|activity
+1|Numerical diagnostic|ML01,ML02|90|45 independent coding; gradient checks; review
+2|Clustering|ML07,ML08|90|Assignment/update; final labels; empty clusters; initialization
+3|Runnable attention|ML10,ML11|90|Shape chain; masks; parity; backward
+4|Sampling and coordinates|GE04,GE05,GE06|90|One base exercise; inverse transforms; invalid data
+5|Detection matching|GE01,GE03,EV01|90|IoU; training matching versus evaluation matching
+6|Pooling and point clouds|CV02,GE09|90|One base exercise; repeated-index accumulation
+7|Data and conventional coding|DS07,DS06,DS02|90|Blind parser/RLE/graph variant; errors and complexity
+8|Evaluation statistics|EV05,EV06,EV13|90|Calibration or paired comparison; estimand and uncertainty
+9|Staff evaluation design|EV08,EV09,EV14|90|Versioned evidence; critical slices; advancement decision
+10|Blind mock and rerouting|ML11,SE02,RX01|90|Implementation and oral extension; choose next drills from errors

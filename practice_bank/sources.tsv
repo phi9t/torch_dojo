@@ -1,0 +1,9 @@
+id|organization|kind|topic|url|link_status|caveat
+O02|NumPy official reference|O|Broadcasting rules|https://numpy.org/doc/stable/user/basics.broadcasting.html|verified|Technical reference
+O03|PyTorch official reference|O|Scaled dot product attention|https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html|verified|Technical reference
+O04|PyTorch official reference|O|Cross entropy logits and reductions|https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html|verified|Technical reference
+O05|Autonomy research|O|EMMA|https://arxiv.org/abs/2410.23262|verified|Research reference
+O06|Autonomy simulation research|O|Sim Agents|https://arxiv.org/abs/2305.12032|verified|Evaluation reference
+O07|PyTorch official reference|O|CUDA notes|https://docs.pytorch.org/docs/stable/notes/cuda.html|verified|Technical reference
+O08|NumPy official reference|O|Unbuffered indexed accumulation|https://numpy.org/doc/stable/reference/generated/numpy.ufunc.at.html|handbook|Technical reference
+O09|NumPy official reference|O|Sliding window views|https://numpy.org/doc/stable/reference/generated/numpy.lib.stride_tricks.sliding_window_view.html|handbook|Technical reference
