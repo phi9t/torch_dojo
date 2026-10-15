@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dojo Fundamentals</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23101518'/%3E%3Cpath d='M9 8h7a8 8 0 0 1 0 16H9z' fill='none' stroke='%2389d8c5' stroke-width='3'/%3E%3C/svg%3E">
+<meta name="description" content="Seven NumPy fundamentals you can play with: masks, contrastive loss, convolution, IoU, Huber, voxels and ego frames.">
+<style>
+:root{--bg:#101518;--surface:#171f23;--canvas:#131a1d;--raised:#212b30;--panel:#192125;--line:#2d3b40;--line-strong:#48585e;--text:#e7eeeb;--muted:#9aa9ab;--subtle:#7c8e93;--accent:#89d8c5;--accent-bg:#19352f;--amber:#d6b174;--amber-bg:#302b22;--purple:#b7a7e4;--purple-bg:#292735;--wire:#809194;--ink:#0c1513;--focus:#b2ebdc;--blue:#7baecc;--red:#e39d94;color-scheme:dark;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.5}
+:root[data-theme=light]{--bg:#f2f2eb;--surface:#fdfdf8;--canvas:#fcfcf7;--raised:#e8ede2;--panel:#f5f5ee;--line:#dce1d6;--line-strong:#a8b5aa;--text:#25382f;--muted:#5c6d62;--subtle:#626e63;--accent:#236d58;--accent-bg:#e6f2e9;--amber:#886228;--amber-bg:#f3ebd9;--purple:#736097;--purple-bg:#eeebf5;--wire:#788a7b;--ink:#f9fcf5;--focus:#185e48;--blue:#3f708f;--red:#a34f42;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text)}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+a{color:var(--text)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.mono,code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+header{display:flex;align-items:center;gap:24px;max-width:1400px;margin:auto;padding:0 32px;height:64px;border-bottom:1px solid var(--line)}
+.brand{font-weight:650;font-size:16px;letter-spacing:.01em;white-space:nowrap}
+.brand small{color:var(--muted);font-weight:400;margin-left:10px;font-size:12px}
+.spacer{flex:1}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 12px;font-size:12px}
+.btn:hover{border-color:var(--line-strong)}
+.btn[aria-pressed=true]{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+nav{max-width:1400px;margin:auto;padding:0 32px;display:flex;gap:22px;overflow:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+nav button{position:relative;background:none;border:0;padding:14px 0 14px;font-size:13px;color:var(--muted);white-space:nowrap;display:flex;gap:8px;align-items:baseline}
+nav button .n{font:11px ui-monospace,Consolas,monospace;color:var(--subtle)}
+nav button[aria-selected=true]{color:var(--text)}
+nav button[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
+main{max-width:1400px;margin:auto;padding:28px 32px 64px}
+h1{font-size:26px;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 6px}
+.lede{color:var(--muted);max-width:68ch;margin:0 0 22px;font-size:15px;line-height:1.6}
+.lesson{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+.stage{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:20px;min-width:0;overflow-x:auto}.lesson>*{min-width:0}
+.guide{display:flex;flex-direction:column;gap:12px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:14px 16px}
+.card p{margin:0;line-height:1.6}
+.card.idea{border-color:var(--accent);background:var(--accent-bg)}
+.card.watch{border-color:var(--amber);background:var(--amber-bg)}
+.card details summary{cursor:pointer;color:var(--accent);font-weight:550}
+.card details p{margin-top:8px}
+.say{font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.6;color:var(--text)}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.ctl output{font-family:ui-monospace,Consolas,monospace;color:var(--text);min-width:4ch}
+input[type=range]{accent-color:var(--accent);width:150px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+.chip{border:1px solid var(--line);background:var(--canvas);border-radius:999px;padding:3px 11px;font-size:12px}
+.chip[aria-pressed=true]{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.chip.off[aria-pressed=false]{text-decoration:line-through;color:var(--subtle)}
+.readout{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.readout div{min-width:90px}.readout small{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.readout b{font:600 18px ui-monospace,Consolas,monospace}
+.bad{color:var(--red)}.good{color:var(--accent)}.warn{color:var(--amber)}
+table.grid{border-collapse:separate;border-spacing:4px;margin:auto}
+table.grid td,table.grid th{width:62px;height:46px;text-align:center;border-radius:6px;font:12px ui-monospace,Consolas,monospace}
+table.grid th{font-weight:500;color:var(--muted);background:none;width:auto;padding:0 6px}
+table.grid th.off{text-decoration:line-through;color:var(--subtle)}
+td.cell{background:var(--canvas);border:1px solid var(--line);color:var(--muted)}
+td.cell.no{color:var(--subtle);background:repeating-linear-gradient(135deg,transparent 0 5px,var(--line) 5px 6px)}
+td.cell.diag{outline:1.5px solid var(--amber);outline-offset:-2px}
+td.cell.sel{outline:2px solid var(--accent);outline-offset:-2px}
+td.cell.win{outline:2px solid var(--amber);outline-offset:-2px}
+td.cell.pad{opacity:.55;border-style:dashed}
+td.cell.click{cursor:pointer}
+.note{font-size:12px;color:var(--muted);margin:12px 0 0;max-width:70ch;line-height:1.6}
+.kv{font:13px ui-monospace,Consolas,monospace;background:var(--canvas);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:12px;overflow-wrap:anywhere;white-space:pre-wrap}
+svg{display:block;max-width:100%;height:auto;margin:auto}
+svg text{fill:var(--muted);font:11px ui-monospace,Consolas,monospace}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;justify-content:center}.row>*{min-width:0;max-width:100%;overflow-x:auto}
+.sub{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;text-align:center}
+.start{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:12px}
+.start button{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:block;width:100%}
+.start button:hover{border-color:var(--accent)}
+.start .t{font-weight:600;font-size:15px;display:block;margin:2px 0 6px}
+.start .m{font:11px ui-monospace,Consolas,monospace;color:var(--subtle)}
+.start p{margin:0;color:var(--muted);font-size:13px}
+footer{max-width:1400px;margin:auto;padding:20px 32px 40px;color:var(--subtle);font-size:12px;border-top:1px solid var(--line)}
+@media(max-width:980px){.lesson{grid-template-columns:1fr}header,nav,main,footer{padding-left:16px;padding-right:16px}}
+@media(max-width:520px){header{height:auto;min-height:64px;gap:8px;padding-top:10px;padding-bottom:10px}.brand{white-space:normal}.brand small{display:block;margin-left:0;font-size:11px}.stage{padding:12px}table.grid{border-spacing:3px}table.grid td{width:38px;height:36px;font-size:11px}table.grid th{padding:0 2px;font-size:10px}.ctl{flex-wrap:wrap}input[type=range]{width:110px}.card a{overflow-wrap:anywhere}.readout b{overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Dojo Fundamentals<small>NumPy practice set 0125–0131</small></div>
+  <div class="spacer"></div>
+  <button class="btn" id="theme" aria-pressed="false">Light</button>
+</header>
+<nav id="tabs" role="tablist" aria-label="Fundamentals"></nav>
+<main id="view" role="tabpanel" tabindex="0"></main>
+<footer>Companion to the Torch Dojo workouts. Everything here runs in your browser: no network, no tracking. Play, then write the code in the dojo and run the checks. <a href="../lab/">Open the browser dojo</a> · <a href="https://github.com/phi9t/torch_dojo/blob/main/docs/practice/numpy-torch-cheatsheet.md">NumPy / PyTorch cheatsheet</a>.</footer>
+
+<script id="math">
+// Pure math, no DOM. Mirrors the dojo references so the page cannot teach a wrong rule.
+const FM = (() => {
+  const sum = a => a.reduce((x, y) => x + y, 0);
+  const softmaxMasked = (row, allowed, safe) => {
+    if (!allowed.some(Boolean)) return row.map(() => (safe ? 0 : NaN));
+    const m = Math.max(...row.filter((_, j) => allowed[j]));
+    const e = row.map((v, j) => (allowed[j] ? Math.exp(v - m) : 0));
+    const s = sum(e);
+    return e.map(v => v / s);
+  };
+  const allowedMatrix = (valid, causal) =>
+    valid.map((qi, i) => valid.map((kj, j) => Boolean(qi && kj && (!causal || j <= i))));
+  const attentionWeights = (S, valid, causal, safe) => {
+    const A = allowedMatrix(valid, causal);
+    return { allowed: A, weights: S.map((row, i) => softmaxMasked(row, A[i], safe)) };
+  };
+  // Contrastive loss on unit vectors given by angles.
+  const logsumexp = r => { const m = Math.max(...r); return m + Math.log(sum(r.map(v => Math.exp(v - m)))); };
+  const contrastive = (xa, ya, t, valid) => {
+    const idx = valid.map((v, i) => (v ? i : -1)).filter(i => i >= 0);
+    const n = idx.length;
+    if (!n) return { n, logits: [], probs: [], lossXY: 0, lossYX: 0, loss: 0 };
+    const logits = idx.map(i => idx.map(j => Math.cos(xa[i] - ya[j]) / t));
+    const ce = L => sum(L.map((row, i) => logsumexp(row) - row[i])) / n;
+    const probs = logits.map(r => { const l = logsumexp(r); return r.map(v => Math.exp(v - l)); });
+    const lt = logits.map((_, i) => logits.map((_, j) => logits[j][i]));
+    const lossXY = ce(logits), lossYX = ce(lt);
+    return { n, idx, logits, probs, lossXY, lossYX, loss: 0.5 * (lossXY + lossYX) };
+  };
+  // Single-channel cross-correlation.
+  const outSize = (n, k, s, p) => Math.floor((n + 2 * p - k) / s) + 1;
+  const pad2 = (X, p) => {
+    const h = X.length, w = X[0].length;
+    return Array.from({ length: h + 2 * p }, (_, i) => Array.from({ length: w + 2 * p }, (_, j) =>
+      (i >= p && i < h + p && j >= p && j < w + p ? X[i - p][j - p] : 0)));
+  };
+  const flipKernel = K => K.slice().reverse().map(r => r.slice().reverse());
+  const conv2d = (X, K, s, p, flip) => {
+    const kern = flip ? flipKernel(K) : K;
+    const P = pad2(X, p), kh = K.length, kw = K[0].length;
+    const ho = outSize(X.length, kh, s, p), wo = outSize(X[0].length, kw, s, p);
+    if (ho < 1 || wo < 1) return { error: true, ho, wo, P };
+    const out = Array.from({ length: ho }, (_, i) => Array.from({ length: wo }, (_, j) => {
+      let a = 0;
+      for (let u = 0; u < kh; u++) for (let v = 0; v < kw; v++) a += P[i * s + u][j * s + v] * kern[u][v];
+      return a;
+    }));
+    return { out, ho, wo, P, kern };
+  };
+  const iou = (a, b) => {
+    const w = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+    const h = Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+    const inter = w * h;
+    const area = r => Math.max(0, r[2] - r[0]) * Math.max(0, r[3] - r[1]);
+    const union = area(a) + area(b) - inter;
+    return { inter, union, iou: union > 0 ? inter / union : 0, w, h };
+  };
+  const huber = (r, d) => (Math.abs(r) <= d ? 0.5 * r * r : d * (Math.abs(r) - 0.5 * d));
+  const huberGrad = (r, d) => Math.max(-d, Math.min(d, r));
+  // Masked mean Huber over rows of residuals. "select" ignores invalid rows; "multiply" does mask*value.
+  const maskedHuber = (rows, valid, d, method) => {
+    const n = valid.filter(Boolean).length;
+    if (!n) return 0;
+    const per = rows.map((r, i) => (method === 'select' ? (valid[i] ? huber(r, d) : 0) : huber(r, d) * (valid[i] ? 1 : 0)));
+    return sum(per) / n;
+  };
+  const voxel = (pts, origin, size, shape) => {
+    const cells = new Map();
+    const labels = pts.map(p => {
+      const c = [Math.floor((p.x - origin[0]) / size), Math.floor((p.y - origin[1]) / size)];
+      const inside = c[0] >= 0 && c[0] < shape[0] && c[1] >= 0 && c[1] < shape[1];
+      if (inside) {
+        const key = c[0] * shape[1] + c[1]; // row-major: lexicographic by x, then y
+        const e = cells.get(key) || { c, n: 0, f: 0 };
+        e.n++; e.f += p.f; cells.set(key, e);
+      }
+      return { c, inside };
+    });
+    const occupied = [...cells.entries()].sort((a, b) => a[0] - b[0]).map(([, e]) => ({ c: e.c, n: e.n, mean: e.f / e.n }));
+    return { labels, occupied };
+  };
+  const rot = th => [[Math.cos(th), -Math.sin(th)], [Math.sin(th), Math.cos(th)]];
+  const mv = (R, v) => [R[0][0] * v[0] + R[0][1] * v[1], R[1][0] * v[0] + R[1][1] * v[1]];
+  const mtv = (R, v) => [R[0][0] * v[0] + R[1][0] * v[1], R[0][1] * v[0] + R[1][1] * v[1]];
+  // p_current = Rc^T (Rh p + th - tc): rigid inverse is R^T, never a general matrix inverse.
+  const egoTransform = (p, h, c) => {
+    const w = mv(rot(h.th), p).map((v, i) => v + [h.x, h.y][i]);
+    const cur = mtv(rot(c.th), [w[0] - c.x, w[1] - c.y]);
+    return { world: w, current: cur };
+  };
+  return { softmaxMasked, allowedMatrix, attentionWeights, contrastive, outSize, conv2d, flipKernel, iou, huber, huberGrad, maskedHuber, voxel, egoTransform };
+})();
+if (typeof module !== 'undefined') module.exports = FM;
+</script>
+
+<script id="app">
+const REPO = 'https://github.com/phi9t/torch_dojo/blob/main/dojo/';
+const fmt = (v, d = 3) => (Number.isNaN(v) ? 'NaN' : (Math.abs(v) < 5e-4 ? 0 : v).toFixed(d));
+const NS = 'http://www.w3.org/2000/svg';
+function h(tag, props = {}, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === 'class') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, '');
+    else if (v !== false && v != null) el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(kid));
+  return el;
+}
+function sv(tag, props = {}, ...kids) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(props || {})) el.setAttribute(k, v);
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(kid));
+  return el;
+}
+const heat = (p, color = 'var(--accent)') => `color-mix(in srgb, ${color} ${Math.round(Math.max(0, Math.min(1, p)) * 70)}%, var(--canvas))`;
+function slider(label, min, max, step, value, onInput, show = v => v) {
+  const out = h('output', {}, show(value));
+  const inp = h('input', { type: 'range', min, max, step, value, 'aria-label': label,
+    oninput: e => { const v = parseFloat(e.target.value); out.textContent = show(v); onInput(v); } });
+  return h('label', { class: 'ctl' }, label, inp, out);
+}
+function toggle(label, value, onChange, cls = '') {
+  const b = h('button', { class: 'chip ' + cls, 'aria-pressed': String(value), onclick: () => {
+    value = !value; b.setAttribute('aria-pressed', String(value)); onChange(value); } }, label);
+  return b;
+}
+function choice(label, options, value, onChange) {
+  const wrap = h('div', { class: 'chips', role: 'group', 'aria-label': label }, h('span', { class: 'ctl' }, label));
+  const bs = options.map(([k, text]) => {
+    const b = h('button', { class: 'chip', 'aria-pressed': String(k === value), onclick: () => {
+      bs.forEach(x => x.b.setAttribute('aria-pressed', String(x.k === k))); onChange(k); } }, text);
+    return { k, b };
+  });
+  bs.forEach(x => wrap.append(x.b));
+  return wrap;
+}
+function guide({ idea, predict, answer, watch, say, dojo, file, minutes }) {
+  return h('div', { class: 'guide' },
+    h('div', { class: 'card idea' }, h('h2', {}, 'The idea'), h('p', {}, idea)),
+    h('div', { class: 'card' }, h('h2', {}, 'Predict first'), h('p', {}, predict),
+      h('details', {}, h('summary', {}, 'Reveal'), h('p', {}, answer))),
+    h('div', { class: 'card watch' }, h('h2', {}, 'Watch out'), h('p', {}, watch)),
+    h('div', { class: 'card' }, h('h2', {}, 'Say it out loud'), h('p', { class: 'say' }, say)),
+    h('div', { class: 'card' }, h('h2', {}, `Dojo ${dojo} · ${minutes} min`),
+      h('p', {}, h('a', { href: REPO + file, target: '_blank', rel: 'noopener' }, file))));
+}
+function lesson(title, lede, stage, g) {
+  return h('div', {}, h('h1', {}, title), h('p', { class: 'lede' }, lede), h('div', { class: 'lesson' }, stage, g));
+}
+function readout(items) {
+  return h('div', { class: 'readout' }, items.map(([k, v, cls]) => h('div', {}, h('small', {}, k), h('b', { class: cls || '' }, v))));
+}
+
+/* ---------- 1. Masks ---------- */
+function masks() {
+  const S = [[1.2, .3, -.5, .8, .1], [.4, 1.5, .2, -.3, .9], [-.2, .6, 1.1, .5, 0], [.7, -.1, .4, 1.3, .6], [.2, .8, -.4, .3, 1.4]];
+  const st = { valid: [true, true, false, true, true], causal: false, safe: true };
+  const body = h('div');
+  const draw = () => {
+    const { allowed, weights } = FM.attentionWeights(S, st.valid, st.causal, st.safe);
+    const t = h('table', { class: 'grid', 'aria-label': 'attention weights' });
+    t.append(h('tr', {}, h('th', {}), ...st.valid.map((v, j) => h('th', { class: v ? '' : 'off' }, 'k' + j)), h('th', {})));
+    weights.forEach((row, i) => {
+      const empty = !allowed[i].some(Boolean);
+      t.append(h('tr', {}, h('th', { class: st.valid[i] ? '' : 'off' }, 'q' + i),
+        ...row.map((w, j) => allowed[i][j]
+          ? h('td', { class: 'cell', style: `background:${heat(w)};color:var(--text)` }, fmt(w, 2))
+          : h('td', { class: 'cell no' + (empty && !st.safe ? ' bad' : ''), style: empty && !st.safe ? 'color:var(--red)' : '' }, empty && !st.safe ? 'NaN' : '·')),
+        h('th', { class: empty ? (st.safe ? 'good' : 'bad') : '' }, empty ? (st.safe ? 'empty → 0' : 'NaN row') : 'Σ 1')));
+    });
+    const empties = allowed.filter(r => !r.some(Boolean)).length;
+    body.replaceChildren(t, h('p', { class: 'note' }, 'Row = query, column = key. A cell is allowed only if the query AND the key are valid (and, if causal, j ≤ i). Striped cells receive exactly zero weight.'),
+      readout([['empty rows', String(empties), empties ? 'warn' : ''], ['row sums', empties && !st.safe ? 'contain NaN' : '1 or 0', empties && !st.safe ? 'bad' : 'good']]));
+  };
+  const ctl = h('div', { class: 'controls' },
+    h('div', { class: 'chips' }, h('span', { class: 'ctl' }, 'valid tokens'), ...st.valid.map((v, i) => toggle('t' + i, v, x => { st.valid[i] = x; draw(); }, 'off'))),
+    toggle('causal', st.causal, x => { st.causal = x; draw(); }),
+    toggle('safe softmax', st.safe, x => { st.safe = x; draw(); }));
+  draw();
+  return lesson('Masks decide who may look at whom',
+    'Attention scores are a T×T table. A mask is a same-shaped table of yes/no. Padding, causality and "this row has nothing to look at" are all just entries in it.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'allowed[i,j] = valid[i] AND valid[j] AND (j ≤ i if causal). Disallowed scores become −inf, which softmax turns into exactly 0.',
+      predict: 'Tokens 0,1,3,4 valid, token 2 invalid, causal on. Which query rows end up with no allowed key?',
+      answer: 'Only row 2 (an invalid query). Rows 3 and 4 still see tokens 0,1 (and themselves). Turn "safe softmax" off to watch the empty row become NaN.',
+      watch: 'A row of all −inf has max −inf, and −inf − (−inf) = NaN. Fix it BEFORE softmax (give empty rows score 0) and divide by 1 instead of 0. Cleaning NaNs afterwards is too late for the backward pass.',
+      say: '"Mask once as a boolean table, select with where, subtract the row max, and guard the empty rows. Full attention takes O(B·T·D² + B·T²·D) time including projections, and O(B·H·T² + B·T·D) intermediate memory."',
+      dojo: '0125', file: '0125_masked_self_attention.py', minutes: 25 }));
+}
+
+/* ---------- 2. Contrastive ---------- */
+function contrastive() {
+  const xa = [0.2, 1.5, 3.0, 4.6];
+  const base = [0.15, -0.2, 0.25, -0.1];
+  const st = { t: 0.5, noise: 0.4, valid: [true, true, true, true] };
+  const body = h('div');
+  const draw = () => {
+    const ya = xa.map((a, i) => a + base[i] * st.noise / 0.4);
+    const r = FM.contrastive(xa, ya, st.t, st.valid);
+    const R = 100, cx = 120, cy = 120;
+    const svg = sv('svg', { viewBox: '0 0 240 240', width: 240, 'aria-label': 'embeddings on the unit circle' },
+      sv('circle', { cx, cy, r: R, fill: 'none', stroke: 'var(--line-strong)' }),
+      ...xa.flatMap((a, i) => {
+        const on = st.valid[i];
+        const line = (ang, col) => sv('line', { x1: cx, y1: cy, x2: cx + R * Math.cos(ang), y2: cy - R * Math.sin(ang), stroke: col, 'stroke-width': 2, opacity: on ? 1 : .2 });
+        const lab = (ang, col, txt) => sv('text', { x: cx + (R + 12) * Math.cos(ang) - 4, y: cy - (R + 12) * Math.sin(ang) + 4, fill: col, style: `fill:${col}`, opacity: on ? 1 : .3 }, txt);
+        return [line(a, 'var(--accent)'), line(ya[i], 'var(--amber)'), lab(a, 'var(--accent)', 'x' + i), lab(ya[i], 'var(--amber)', 'y' + i)];
+      }));
+    const t = h('table', { class: 'grid', 'aria-label': 'X to Y probabilities' });
+    t.append(h('tr', {}, h('th', {}), ...(r.idx || []).map(j => h('th', {}, 'y' + j))));
+    (r.probs || []).forEach((row, a) => t.append(h('tr', {}, h('th', {}, 'x' + r.idx[a]),
+      ...row.map((p, b) => h('td', { class: 'cell' + (a === b ? ' diag' : ''), style: `background:${heat(p)};color:var(--text)` }, fmt(p, 2))))));
+    body.replaceChildren(
+      h('div', { class: 'row' }, h('div', {}, h('p', { class: 'sub' }, 'unit embeddings'), svg),
+        h('div', {}, h('p', { class: 'sub' }, 'P(match | query), row-softmax'), r.n ? t : h('p', { class: 'note' }, 'No valid pairs → loss 0.'))),
+      h('p', { class: 'note' }, 'Amber outline = the true match (diagonal). Each row is a cross-entropy over all valid candidates; the loss averages X→Y and Y→X.'),
+      readout([['valid pairs', String(r.n)], ['X→Y', fmt(r.lossXY)], ['Y→X', fmt(r.lossYX)], ['loss', fmt(r.loss), 'good'], ['log n (uniform guess)', r.n ? fmt(Math.log(r.n)) : '0']]));
+  };
+  const ctl = h('div', { class: 'controls' },
+    slider('temperature', 0.05, 2, 0.05, st.t, v => { st.t = v; draw(); }, v => v.toFixed(2)),
+    slider('mismatch', 0, 1.2, 0.05, st.noise, v => { st.noise = v; draw(); }, v => v.toFixed(2)),
+    h('div', { class: 'chips' }, h('span', { class: 'ctl' }, 'valid pairs'), ...st.valid.map((v, i) => toggle('p' + i, v, x => { st.valid[i] = x; draw(); }, 'off'))));
+  draw();
+  return lesson('Contrastive loss pulls matches together',
+    'Row i of X should be closer to row i of Y than to any other row. Cosine similarity over a temperature gives a softmax; the correct partner is the diagonal.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'Normalize, compute logits = Xn·Ynᵀ / t, then cross-entropy with diagonal targets, both directions. Low temperature sharpens the softmax; high temperature flattens it toward log n.',
+      predict: 'Make the temperature large (2.0). What does the loss approach, and why?',
+      answer: 'log(number of valid pairs): every logit is nearly equal, so each row is a uniform guess among n candidates. One valid pair gives log 1 = 0.',
+      watch: 'Drop invalid pairs from BOTH sets before normalizing, so garbage in an invalid row can never leak. Use stable logsumexp. log n is the uniform-guess baseline, not a ceiling: confidently choosing the wrong partner can give a much larger loss.',
+      say: '"Normalize with max(norm, eps), logits [n,n], stable logsumexp, average the two directions. For n valid pairs: O(n²·D) time, plus filtering; O(n·D + n²) intermediate memory for embeddings and pair scores."',
+      dojo: '0126', file: '0126_contrastive_loss.py', minutes: 20 }));
+}
+
+/* ---------- 3. Conv2D ---------- */
+function conv() {
+  const inputs = { 3: [[1, 2, 3], [4, 5, 6], [7, 8, 9]], 5: Array.from({ length: 5 }, (_, i) => Array.from({ length: 5 }, (_, j) => i * 5 + j + 1)) };
+  const kernels = { diag: [[1, 0], [0, -1]], asym: [[1, 2], [3, 4]], sobel: [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], box: [[1, 1, 1], [1, 1, 1], [1, 1, 1]] };
+  const st = { size: 3, k: 'diag', s: 1, p: 0, flip: false, sel: [0, 0] };
+  const body = h('div');
+  const draw = () => {
+    const X = inputs[st.size], K = kernels[st.k];
+    const res = FM.conv2d(X, K, st.s, st.p, st.flip);
+    const ho = FM.outSize(X.length, K.length, st.s, st.p), wo = FM.outSize(X[0].length, K[0].length, st.s, st.p);
+    const formula = `Ho = ⌊(${X.length} + 2·${st.p} − ${K.length}) / ${st.s}⌋ + 1 = ${ho}`;
+    if (res.error) {
+      body.replaceChildren(h('p', { class: 'note bad' }, 'Kernel is larger than the padded input: the output size is not positive. The dojo expects a ValueError here.'), readout([['output size', formula, 'bad']]));
+      return;
+    }
+    st.sel = [Math.min(st.sel[0], res.ho - 1), Math.min(st.sel[1], res.wo - 1)];
+    const [si, sj] = st.sel, kh = K.length, kw = K[0].length;
+    const inWin = (i, j) => i >= si * st.s && i < si * st.s + kh && j >= sj * st.s && j < sj * st.s + kw;
+    const P = res.P;
+    const inG = h('table', { class: 'grid' }, P.map((row, i) => h('tr', {}, row.map((v, j) => h('td',
+      { class: 'cell' + (inWin(i, j) ? ' win' : '') + (i < st.p || j < st.p || i >= P.length - st.p || j >= P[0].length - st.p ? ' pad' : '') }, v)))));
+    const kG = h('table', { class: 'grid' }, res.kern.map(row => h('tr', {}, row.map(v => h('td', { class: 'cell' }, v)))));
+    const outG = h('table', { class: 'grid' }, res.out.map((row, i) => h('tr', {}, row.map((v, j) => h('td',
+      { class: 'cell click' + (i === si && j === sj ? ' sel' : ''), style: 'color:var(--text)', tabindex: 0, role: 'button', 'aria-label': `output ${i},${j} = ${v}`,
+        onclick: () => { st.sel = [i, j]; draw(); }, onkeydown: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); st.sel = [i, j]; draw(); } } }, v)))));
+    const terms = [];
+    for (let u = 0; u < kh; u++) for (let v = 0; v < kw; v++) terms.push(`${P[si * st.s + u][sj * st.s + v]}·${res.kern[u][v] < 0 ? '(' + res.kern[u][v] + ')' : res.kern[u][v]}`);
+    body.replaceChildren(
+      h('div', { class: 'row' }, h('div', {}, h('p', { class: 'sub' }, 'padded input'), inG), h('div', {}, h('p', { class: 'sub' }, st.flip ? 'kernel (FLIPPED)' : 'kernel'), kG), h('div', {}, h('p', { class: 'sub' }, 'output: click a cell'), outG)),
+      h('div', { class: 'kv' }, `out[${si},${sj}] = ${terms.join(' + ')} = ${res.out[si][sj]}`),
+      readout([['output size', `${res.ho}×${res.wo}`, 'good'], ['formula', formula]]));
+  };
+  const ctl = h('div', { class: 'controls' },
+    choice('input', [[3, '3×3'], [5, '5×5']], st.size, v => { st.size = v; st.sel = [0, 0]; draw(); }),
+    choice('kernel', [['diag', 'diag 2×2'], ['asym', '[[1,2],[3,4]]'], ['sobel', 'sobel 3×3'], ['box', 'box 3×3']], st.k, v => { st.k = v; draw(); }),
+    choice('stride', [[1, '1'], [2, '2']], st.s, v => { st.s = v; draw(); }),
+    choice('padding', [[0, '0'], [1, '1'], [2, '2']], st.p, v => { st.p = v; draw(); }),
+    toggle('flip kernel (true convolution)', st.flip, v => { st.flip = v; draw(); }));
+  draw();
+  return lesson('A convolution is a sliding dot product',
+    'Each output cell is the sum of an input window times the kernel. Padding adds zero border; stride skips positions. Nothing else is happening.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'out = Σ over channels and kernel taps of window × weight, with Ho = ⌊(H + 2p − Kh)/s⌋ + 1. Deep-learning "convolution" does NOT flip the kernel; that is cross-correlation.',
+      predict: 'Input 1..9 (3×3), kernel [[1,0],[0,−1]], stride 1, pad 0. What is every output cell?',
+      answer: '−4 everywhere: each window is [[a,b],[d,e]] and the kernel gives a − e, which is −4 for this ramp. Tick "flip" and it changes, which is exactly the trap.',
+      watch: 'Padding must be zeros, not edge values. A loop-based reference is a good first step. Then try patch extraction and contraction: im2col materializes B·Ho·Wo·Cin·Kh·Kw elements, roughly Kh·Kw times the input size for stride 1 and similar spatial dimensions.',
+      say: '"Pad, slide, contract over Cin and taps. Time O(B·Cout·Cin·Kh·Kw·Ho·Wo). A direct reference needs padded input and output storage; materialized im2col adds O(B·Ho·Wo·Cin·Kh·Kw) memory."',
+      dojo: '0127', file: '0127_conv2d_scratch.py', minutes: 20 }));
+}
+
+/* ---------- 4. IoU ---------- */
+function iouLesson() {
+  const A = [1, 1, 5, 5];
+  const st = { bx: 3, by: 3, w: 4, h: 4 };
+  const sc = 28, W = 11 * sc;
+  const body = h('div');
+  let drag = null;
+  body.addEventListener('pointermove', e => {
+    if (!drag) return;
+    st.bx = Math.max(-1, Math.min(11 - st.w, drag.x + (e.clientX - drag.px) / drag.scale));
+    st.by = Math.max(-1, Math.min(11 - st.h, drag.y + (e.clientY - drag.py) / drag.scale));
+    draw();
+  });
+  const endDrag = () => { drag = null; };
+  body.addEventListener('pointerup', endDrag);
+  body.addEventListener('pointercancel', endDrag);
+  body.addEventListener('lostpointercapture', endDrag);
+  const draw = () => {
+    const B = [st.bx, st.by, st.bx + st.w, st.by + st.h];
+    const r = FM.iou(A, B);
+    const rect = (b, col, extra = {}) => sv('rect', { x: b[0] * sc, y: b[1] * sc, width: (b[2] - b[0]) * sc, height: (b[3] - b[1]) * sc, fill: col, 'fill-opacity': .18, stroke: col, 'stroke-width': 1.5, ...extra });
+    const inter = r.inter > 0 ? sv('rect', { x: Math.max(A[0], B[0]) * sc, y: Math.max(A[1], B[1]) * sc, width: r.w * sc, height: r.h * sc, fill: 'var(--purple)', 'fill-opacity': .5 }) : null;
+    const world = sv('svg', { viewBox: `0 0 ${W} ${W}`, width: W, role: 'img', 'aria-label': 'two boxes', style: 'touch-action:none;cursor:grab;border:1px solid var(--line);border-radius:6px;background:var(--canvas)' },
+      rect(A, 'var(--accent)'), rect(B, 'var(--amber)'), inter,
+      sv('text', { x: A[0] * sc + 4, y: A[1] * sc + 14 }, 'A'), sv('text', { x: B[0] * sc + 4, y: B[1] * sc + 14 }, 'B (drag)'));
+    world.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      drag = { px: e.clientX, py: e.clientY, x: st.bx, y: st.by, scale: sc * world.getBoundingClientRect().width / W };
+      body.setPointerCapture(e.pointerId);
+    });
+    // IoU along a horizontal sweep of B.
+    const pw = 360, ph = 120, xs = Array.from({ length: 121 }, (_, i) => -6 + i * 0.15);
+    const ys = xs.map(x => FM.iou(A, [x, st.by, x + st.w, st.by + st.h]).iou);
+    const px = x => ((x + 6) / 18) * pw, py = v => ph - 10 - v * (ph - 20);
+    const path = xs.map((x, i) => `${i ? 'L' : 'M'}${px(x).toFixed(1)},${py(ys[i]).toFixed(1)}`).join('');
+    const curve = sv('svg', { viewBox: `0 0 ${pw} ${ph}`, width: pw, role: 'img', 'aria-label': 'IoU as B slides right' },
+      sv('line', { x1: 0, y1: py(0), x2: pw, y2: py(0), stroke: 'var(--line-strong)' }),
+      xs.slice(0, -1).map((x, i) => ys[i] === 0 && ys[i + 1] === 0 ? sv('rect', { x: px(x), y: 8, width: px(xs[i + 1]) - px(x), height: ph - 18, fill: 'var(--red)', 'fill-opacity': .08 }) : null),
+      sv('path', { d: path, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 2 }),
+      sv('circle', { cx: px(st.bx), cy: py(r.iou), r: 5, fill: 'var(--amber)' }),
+      sv('text', { x: 6, y: 14 }, 'IoU as B slides right'), sv('text', { x: pw - 150, y: ph - 14 }, 'flat 0: no signal'));
+    body.replaceChildren(h('div', { class: 'row' }, h('div', {}, h('p', { class: 'sub' }, 'boxes'), world), h('div', {}, h('p', { class: 'sub' }, 'IoU along the sweep'), curve)),
+      readout([['intersection', fmt(r.inter, 2)], ['union', fmt(r.union, 2)], ['IoU', fmt(r.iou), r.iou === 0 ? 'bad' : 'good'], ['1 − IoU', fmt(1 - r.iou)]]));
+  };
+  const ctl = h('div', { class: 'controls' },
+    slider('B width', 0, 6, 0.5, st.w, v => { st.w = v; draw(); }), slider('B height', 0, 6, 0.5, st.h, v => { st.h = v; draw(); }),
+    h('div', { class: 'chips', role: 'group', 'aria-label': 'Move box B' },
+      ...[['←', -0.5, 0, 'Move B left'], ['→', 0.5, 0, 'Move B right'], ['↑', 0, -0.5, 'Move B up'], ['↓', 0, 0.5, 'Move B down']].map(([label, dx, dy, name]) =>
+        h('button', { class: 'btn', 'aria-label': name, onclick: () => {
+          st.bx = Math.max(-1, Math.min(11 - st.w, st.bx + dx));
+          st.by = Math.max(-1, Math.min(11 - st.h, st.by + dy)); draw();
+        } }, label))),
+    h('span', { class: 'ctl' }, 'Set a width to 0 to see a zero-area box score 0, never NaN.'));
+  draw();
+  return lesson('IoU is overlap divided by union',
+    'Clamp each overlap side at zero, multiply, and divide by the union. A pair grid is just broadcasting [N,1,·] against [1,M,·].',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'inter = max(0, min(x1) − max(x0)) × max(0, min(y1) − max(y0)); IoU = inter / (areaA + areaB − inter), or 0 when the union is 0.',
+      predict: 'Boxes [0,0,2,2] and [1,1,3,3]. What is the IoU?',
+      answer: '1/7. The overlap is a 1×1 square; the union is 4 + 4 − 1 = 7.',
+      watch: 'Clamp each side BEFORE multiplying: two negative sides multiply to a positive "overlap" for far-apart boxes. And note the flat region: when boxes are disjoint, IoU is 0 for every position, so 1 − IoU gives no gradient to pull a prediction toward the target.',
+      say: '"Broadcast to [N,M,2] corners, clamp, multiply, guard the zero union. Time and peak memory O(N·M)."',
+      dojo: '0128', file: '0128_box_iou_grid.py', minutes: 15 }));
+}
+
+/* ---------- 5. Huber ---------- */
+function huberLesson() {
+  const st = { d: 1, r: -2, method: 'select' };
+  const body = h('div');
+  const draw = () => {
+    const w = 440, hh = 260, lim = 4, ymin = -2.2, ymax = 5;
+    const px = x => ((x + lim) / (2 * lim)) * (w - 20) + 10, py = y => hh - 20 - ((y - ymin) / (ymax - ymin)) * (hh - 30);
+    const xs = Array.from({ length: 161 }, (_, i) => -lim + i * 0.05);
+    const line = (f, extra) => sv('path', { d: xs.map((x, i) => `${i ? 'L' : 'M'}${px(x).toFixed(1)},${py(Math.max(ymin, Math.min(ymax, f(x)))).toFixed(1)}`).join(''), fill: 'none', 'stroke-width': 2, ...extra });
+    const lossVal = FM.huber(st.r, st.d), g = FM.huberGrad(st.r, st.d);
+    const svg = sv('svg', { viewBox: `0 0 ${w} ${hh}`, width: w, role: 'img', 'aria-label': 'Huber loss and gradient' },
+      sv('line', { x1: px(-lim), y1: py(0), x2: px(lim), y2: py(0), stroke: 'var(--line-strong)' }), sv('line', { x1: px(0), y1: py(ymin), x2: px(0), y2: py(ymax), stroke: 'var(--line-strong)' }),
+      sv('rect', { x: px(-st.d), y: py(ymax), width: px(st.d) - px(-st.d), height: py(ymin) - py(ymax), fill: 'var(--accent)', 'fill-opacity': .07 }),
+      line(x => .5 * x * x, { stroke: 'var(--subtle)', 'stroke-dasharray': '4 4' }),
+      line(x => FM.huber(x, st.d), { stroke: 'var(--accent)' }), line(x => FM.huberGrad(x, st.d), { stroke: 'var(--amber)' }),
+      sv('circle', { cx: px(st.r), cy: py(lossVal), r: 5, fill: 'var(--accent)' }), sv('circle', { cx: px(st.r), cy: py(g), r: 5, fill: 'var(--amber)' }),
+      sv('text', { x: px(-st.d) + 4, y: hh - 4 }, '|r| ≤ δ: quadratic'));
+    const rows = [1.5, -0.4, NaN], valid = [true, true, false];
+    const m = FM.maskedHuber(rows, valid, st.d, st.method);
+    body.replaceChildren(svg, h('p', { class: 'note', style: 'text-align:center;margin:8px auto 0' }, h('span', { class: 'good' }, 'green: Huber loss'), '  ·  ', h('span', { class: 'warn' }, 'amber: gradient = clip(r, ±δ)'), '  ·  dashed: ½r²'), readout([['branch', Math.abs(st.r) <= st.d ? 'quadratic' : 'linear'], ['loss', fmt(lossVal)], ['gradient', fmt(g)]]),
+      h('p', { class: 'sub', style: 'margin-top:22px' }, 'masked mean over rows with residuals [1.5, −0.4, NaN] and the NaN row invalid'),
+      h('div', { class: 'row' }, choice('mask by', [['select', 'select (np.where)'], ['multiply', 'multiply (× mask)']], st.method, v => { st.method = v; draw(); }),
+        readout([['masked loss', fmt(m), Number.isNaN(m) ? 'bad' : 'good']])));
+  };
+  const ctl = h('div', { class: 'controls' }, slider('δ', 0.25, 3, 0.25, st.d, v => { st.d = v; draw(); }, v => v.toFixed(2)), slider('residual r', -4, 4, 0.05, st.r, v => { st.r = v; draw(); }, v => v.toFixed(2)));
+  draw();
+  return lesson('Huber: quadratic near zero, linear far away',
+    'Small errors are squared (smooth, gradient proportional to the error). Large errors grow only linearly, so one outlier cannot dominate the batch.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'loss = ½r² for |r| ≤ δ, else δ(|r| − ½δ). Its gradient is simply clip(r, −δ, δ). Divide by the number of valid elements, not by N·D.',
+      predict: 'Residual row [−2, 0.5] with δ = 1. Loss and gradient?',
+      answer: 'Loss (1.5 + 0.125)/2 = 0.8125; gradient [−1, 0.5]/2 = [−0.5, 0.25].',
+      watch: 'Mask by SELECTING, not multiplying: NaN × 0 is NaN, so a garbage invalid row would poison the loss. Try the toggle. Check your gradient against float64 finite differences.',
+      say: '"Gradient is clip(r, ±δ) over the valid count; invalid rows get zero by selection. Time and memory O(N·D)."',
+      dojo: '0129', file: '0129_masked_huber_grad.py', minutes: 10 }));
+}
+
+/* ---------- 6. Voxel ---------- */
+function voxelLesson() {
+  let seed = 7; const rnd = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+  const pts = Array.from({ length: 22 }, () => ({ x: rnd() * 8, y: rnd() * 6, f: Math.round(rnd() * 90 + 10) / 10 }));
+  const st = { size: 1.5, ox: 0 }, shape = [4, 3];
+  const sc = 50, W = 8.4 * sc, H = 6.4 * sc;
+  const body = h('div');
+  const draw = () => {
+    const origin = [st.ox, 0];
+    const { labels, occupied } = FM.voxel(pts, origin, st.size, shape);
+    const hue = c => (c[0] * 53 + c[1] * 97) % 360;
+    const cells = [];
+    for (let i = 0; i < shape[0]; i++) for (let j = 0; j < shape[1]; j++) {
+      const occ = occupied.find(o => o.c[0] === i && o.c[1] === j);
+      cells.push(sv('rect', { x: (origin[0] + i * st.size) * sc + 10, y: H - (origin[1] + (j + 1) * st.size) * sc - 10, width: st.size * sc, height: st.size * sc,
+        fill: occ ? `hsl(${hue([i, j])} 55% 55% / .16)` : 'none', stroke: 'var(--line-strong)' }));
+    }
+    const left = Math.min(0, origin[0] * sc), right = Math.max(W + 20, (origin[0] + shape[0] * st.size) * sc + 20);
+    const top = Math.min(0, H - shape[1] * st.size * sc - 20);
+    const svg = sv('svg', { viewBox: `${left} ${top} ${right - left} ${H + 20 - top}`, width: W + 20, role: 'img', 'aria-label': 'points over a voxel grid, top-down' }, cells,
+      pts.map((p, i) => sv('circle', { cx: p.x * sc + 10, cy: H - p.y * sc - 10, r: 5, fill: labels[i].inside ? `hsl(${hue(labels[i].c)} 60% 55%)` : 'none', stroke: labels[i].inside ? 'none' : 'var(--subtle)', 'stroke-width': 1.5 })));
+    const rowsT = h('table', { class: 'grid', style: 'margin:0' }, h('tr', {}, ['voxel (x,y)', 'count', 'mean f'].map(t => h('th', {}, t))),
+      occupied.map(o => h('tr', {}, h('td', { class: 'cell', style: `width:auto;padding:0 10px;color:var(--text);border-left:5px solid hsl(${hue(o.c)} 60% 55%)` }, `(${o.c[0]}, ${o.c[1]})`), h('td', { class: 'cell', style: 'width:auto;padding:0 8px' }, o.n), h('td', { class: 'cell', style: 'width:auto;padding:0 8px;color:var(--text)' }, fmt(o.mean, 2)))));
+    const kept = labels.filter(l => l.inside).length;
+    body.replaceChildren(h('div', { class: 'row' }, h('div', {}, h('p', { class: 'sub' }, 'top-down (z = 0)'), svg), h('div', { style: 'max-height:340px;overflow:auto' }, h('p', { class: 'sub' }, 'sorted by x, then y'), rowsT)),
+      h('p', { class: 'note' }, 'This 2D slice isolates grouping; the workout uses three coordinates and C feature channels. Hollow points fall outside 0 ≤ index < grid_shape and are dropped. Occupied rows are sorted by their flattened voxel id, giving lexicographic order.'),
+      readout([['points kept', `${kept} / ${pts.length}`], ['occupied voxels', String(occupied.length), 'good'], ['grid', `${shape[0]}×${shape[1]} cells of ${st.size}`]]));
+  };
+  const ctl = h('div', { class: 'controls' }, slider('voxel size', 0.5, 2.5, 0.25, st.size, v => { st.size = v; draw(); }, v => v.toFixed(2)), slider('origin x', -1.5, 1.5, 0.25, st.ox, v => { st.ox = v; draw(); }, v => v.toFixed(2)));
+  draw();
+  return lesson('Voxels: bucket points, average their features',
+    'Turn a point cloud into a sparse grid. Floor each coordinate to an integer cell, drop points outside the grid, then average the features per occupied cell.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'index = floor((p − origin) / size); keep 0 ≤ index < grid_shape on EVERY axis; flatten with ravel_multi_index; np.unique + np.add.at give counts and sums; mean = sum / count.',
+      predict: 'x = [0.1, 0.9, 1.0, 2.0] with size 1 and grid_shape (2,1,1). Which voxels, and which point is dropped?',
+      answer: 'Voxel 0 gets 0.1 and 0.9; voxel 1 gets 1.0 (the lower edge is inclusive); x = 2.0 is index 2, outside the grid, so it is dropped.',
+      watch: 'Use floor, not int(): int(−0.1) is 0 and lets a negative point into voxel 0. Check bounds on the float index BEFORE casting to int, or a huge coordinate overflows.',
+      say: '"Floor, bounds-mask on floats, ravel to a flat id, unique with inverse and counts, add.at the sums. With C feature channels: O(N log N + N·C) time; O(N·C + K·C) extra storage for selected features, grouping and K occupied outputs."',
+      dojo: '0130', file: '0130_voxel_feature_mean.py', minutes: 15 }));
+}
+
+/* ---------- 7. Ego frame ---------- */
+function egoLesson() {
+  const st = { hx: 10, hy: 0, hth: 0, cx: 7, cy: 0, cth: 0, px: 2, py: 0 };
+  const body = h('div');
+  const d2r = d => d * Math.PI / 180;
+  const sc = 30, ox = 50, oy = 200, W = 560, H = 270;
+  const X = x => ox + x * sc, Y = y => oy - y * sc;
+  const draw = () => {
+    const hp = { x: st.hx, y: st.hy, th: d2r(st.hth) }, cp = { x: st.cx, y: st.cy, th: d2r(st.cth) };
+    const r = FM.egoTransform([st.px, st.py], hp, cp);
+    const points = [[0, 0], r.world, ...[hp, cp].flatMap(p => [[p.x, p.y], [p.x + 3 * Math.cos(p.th), p.y + 3 * Math.sin(p.th)], [p.x - 2 * Math.sin(p.th), p.y + 2 * Math.cos(p.th)]])];
+    const left = Math.min(0, ...points.map(p => X(p[0]) - 95)), right = Math.max(W, ...points.map(p => X(p[0]) + 60));
+    const top = Math.min(0, ...points.map(p => Y(p[1]) - 30)), bottom = Math.max(H, ...points.map(p => Y(p[1]) + 30));
+    const frame = (p, col, name) => {
+      const ax = (th, c) => sv('line', { x1: X(p.x), y1: Y(p.y), x2: X(p.x + 3 * Math.cos(p.th + th)), y2: Y(p.y + 3 * Math.sin(p.th + th)), stroke: c, 'stroke-width': 2.5 });
+      return [ax(0, col), sv('line', { x1: X(p.x), y1: Y(p.y), x2: X(p.x - 2 * Math.sin(p.th)), y2: Y(p.y + 2 * Math.cos(p.th)), stroke: col, 'stroke-width': 1.5, opacity: .6 }),
+        sv('text', { x: X(p.x) - 6, y: Y(p.y) + 16, 'text-anchor': 'end', style: `fill:${col}` }, name)];
+    };
+    const svg = sv('svg', { viewBox: `${left} ${top} ${right - left} ${bottom - top}`, width: W, role: 'img', 'aria-label': 'world with two ego frames', style: 'border:1px solid var(--line);border-radius:6px;background:var(--canvas)' },
+      sv('line', { x1: X(-1), y1: Y(0), x2: X(17), y2: Y(0), stroke: 'var(--line)' }), sv('line', { x1: X(0), y1: Y(-2), x2: X(0), y2: Y(6), stroke: 'var(--line)' }),
+      sv('text', { x: X(0) + 4, y: Y(0) - 4 }, 'world'),
+      frame(hp, 'var(--accent)', 'history ego'), frame(cp, 'var(--amber)', 'current ego'),
+      sv('circle', { cx: X(r.world[0]), cy: Y(r.world[1]), r: 6, fill: 'var(--purple)' }),
+      sv('text', { x: X(r.world[0]) + 8, y: Y(r.world[1]) - 8, style: 'fill:var(--purple)' }, 'point'));
+    body.replaceChildren(svg, h('p', { class: 'note' }, 'Top-down slice: z = 0, rotations about z. Bright axis = local x; faint axis = local y. The workout extends the same composition to 3D poses.'), h('div', { class: 'kv' }, `p_hist    = [${fmt(st.px, 2)}, ${fmt(st.py, 2)}]\np_world   = R_h·p_hist + t_h = [${fmt(r.world[0], 2)}, ${fmt(r.world[1], 2)}]\np_current = R_cᵀ·(p_world − t_c) = [${fmt(r.current[0], 2)}, ${fmt(r.current[1], 2)}]`),
+      readout([['current x', fmt(r.current[0], 2), 'good'], ['current y', fmt(r.current[1], 2), 'good']]));
+  };
+  const S = (label, key, min, max, step) => slider(label, min, max, step, st[key], v => { st[key] = v; draw(); }, v => v.toFixed(step < 1 ? 1 : 0));
+  const preset = (name, v) => h('button', { class: 'btn', onclick: () => { Object.assign(st, v); render(); } }, name);
+  const ctl = h('div', { class: 'controls' });
+  const render = () => { ctl.replaceChildren(
+    h('div', { class: 'chips' }, h('span', { class: 'ctl' }, 'presets'), preset('+10 vs +7', { hx: 10, hy: 0, hth: 0, cx: 7, cy: 0, cth: 0, px: 2, py: 0 }), preset('rotate 90°', { hx: 0, hy: 0, hth: 90, cx: 0, cy: 0, cth: 0, px: 1, py: 0 }), preset('general', { hx: 6, hy: 2, hth: 35, cx: 9, cy: 1, cth: -20, px: 2, py: 1 })),
+    S('history x', 'hx', 0, 16, 0.5), S('history y', 'hy', -2, 6, 0.5), S('history θ°', 'hth', -180, 180, 5),
+    S('current x', 'cx', 0, 16, 0.5), S('current y', 'cy', -2, 6, 0.5), S('current θ°', 'cth', -180, 180, 5),
+    S('point x', 'px', -3, 3, 0.5), S('point y', 'py', -3, 3, 0.5)); draw(); };
+  render();
+  return lesson('Move history into the current ego frame',
+    'A point is stored in the frame where it was observed. To compare it with now, go through the world: history → world → current.',
+    h('div', { class: 'stage' }, ctl, body),
+    guide({
+      idea: 'current_from_history = inv(world_from_current) · world_from_history. A rigid inverse is [Rᵀ | −Rᵀt], so you never need a general matrix inverse.',
+      predict: 'History pose x = +10, current pose x = +7, point [2,0,0] in the history frame. Where is it in the current frame?',
+      answer: '[5, 0, 0]: world x is 10 + 2 = 12, and the current frame sits at 7, so 12 − 7 = 5. Click the first preset.',
+      watch: 'Order matters: apply the history pose first, then invert the current pose. Mixing up world_from_x and x_from_world gives a mirror-image error that hand-checkable cases catch. Vectorize over B, A, T with einsum and never mutate inputs.',
+      say: '"Compose Rcᵀ·Rh and Rcᵀ·(th − tc), then one einsum over [B,A,T]. Time O(B·A·T), memory O(B·A·T)."',
+      dojo: '0131', file: '0131_history_to_ego_frame.py', minutes: 10 }));
+}
+
+/* ---------- Start + router ---------- */
+const LESSONS = [
+  ['masks', 'Masks', '0125', masks, 'Padding, causality and empty rows in attention.'],
+  ['contrastive', 'Contrastive loss', '0126', contrastive, 'Temperature, logsumexp and the uniform-guess baseline.'],
+  ['conv', 'Conv2D', '0127', conv, 'Sliding dot products, stride, padding and the no-flip rule.'],
+  ['iou', 'Box IoU', '0128', iouLesson, 'Overlap, union, zero-area boxes and flat gradients.'],
+  ['huber', 'Huber', '0129', huberLesson, 'Two regimes, a manual gradient and select-vs-multiply masks.'],
+  ['voxel', 'Voxels', '0130', voxelLesson, 'Floor, bounds, flatten, and per-cell means.'],
+  ['ego', 'Ego frames', '0131', egoLesson, 'History to world to current with rigid transforms.']
+];
+function start() {
+  return h('div', {}, h('h1', {}, 'Seven fundamentals, one habit'),
+    h('p', { class: 'lede' }, 'Predict, change one input, explain what happened, then write the code in the dojo. Start with attention, contrastive loss, Conv2D and IoU, in that order. Huber, voxels and ego frames extend the practice if time remains. The widgets isolate one idea; the linked workouts cover the full tensor contracts.'),
+    h('p', { class: 'note', style: 'margin:0 0 20px' }, h('a', { href: 'https://github.com/phi9t/torch_dojo/blob/main/docs/practice/numpy-torch-cheatsheet.md' }, 'NumPy / PyTorch cheatsheet'), ' — formulas, shape patterns, API translations and practice checks.'),
+    h('div', { class: 'start' }, LESSONS.map(([id, name, num, , blurb]) => h('button', { onclick: () => go(id) },
+      h('span', { class: 'm' }, `dojo ${num}`), h('span', { class: 't' }, name), h('p', {}, blurb)))));
+}
+const tabs = document.getElementById('tabs'), view = document.getElementById('view');
+const ALL = [['start', 'Start', '', start], ...LESSONS];
+ALL.forEach(([id, name, num]) => tabs.append(h('button', { role: 'tab', id: 'tab-' + id, 'aria-controls': 'view', 'aria-selected': 'false', tabindex: -1, onclick: () => go(id) }, h('span', { class: 'n' }, num || '·'), name)));
+tabs.addEventListener('keydown', e => {
+  const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+  if (!keys.includes(e.key)) return;
+  const i = [...tabs.children].indexOf(document.activeElement);
+  if (i < 0) return;
+  e.preventDefault();
+  const next = e.key === 'Home' ? 0 : e.key === 'End' ? ALL.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + ALL.length) % ALL.length;
+  tabs.children[next].focus(); go(ALL[next][0]);
+});
+function go(id) { location.hash = id; }
+function route() {
+  const id = (location.hash || '#start').slice(1);
+  const item = ALL.find(x => x[0] === id) || ALL[0];
+  for (const b of tabs.children) {
+    const selected = b.id === 'tab-' + item[0];
+    b.setAttribute('aria-selected', String(selected)); b.tabIndex = selected ? 0 : -1;
+  }
+  view.setAttribute('aria-labelledby', 'tab-' + item[0]);
+  view.replaceChildren(item[3]());
+  document.title = (item[0] === 'start' ? 'Dojo Fundamentals' : item[1] + ' · Dojo Fundamentals');
+}
+addEventListener('hashchange', route);
+const themeBtn = document.getElementById('theme');
+function setTheme(t) {
+  document.documentElement.dataset.theme = t; themeBtn.textContent = t === 'light' ? 'Dark' : 'Light'; themeBtn.setAttribute('aria-pressed', String(t === 'light'));
+  try { localStorage.setItem('dojo-theme', t); } catch (e) { /* storage may be blocked */ }
+}
+themeBtn.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'));
+let saved = null; try { saved = localStorage.getItem('dojo-theme'); } catch (e) { /* ignore */ }
+setTheme(saved || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+route();
+</script>
+</body>
+</html>

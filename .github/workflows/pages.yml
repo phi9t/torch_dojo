@@ -1,0 +1,74 @@
+name: Deploy browser dojo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: browser_gym/extension/package-lock.json
+      - name: Install build dependencies
+        run: make -C browser_gym setup
+      - name: Test Python and TypeScript
+        run: |
+          PYTHONPATH=. browser_gym/.venv/bin/python -m pytest browser_gym/tests browser_gym/labs/mlp/test_checks.py -q
+          npm --prefix browser_gym/extension run typecheck
+          npm --prefix browser_gym/extension test
+          python -m unittest tests.test_fundamentals_site
+      - name: Install browser for deployment checks
+        working-directory: browser_gym/extension
+        run: npx playwright install --with-deps chromium
+      - name: Build self-contained browser dojo
+        env:
+          DOJO_BASE_URL: /${{ github.event.repository.name }}/
+        run: make -C browser_gym offline-build
+      - name: Add the Dojo Fundamentals teaching page
+        run: |
+          mkdir -p browser_gym/dist/fundamentals
+          cp site/fundamentals/index.html browser_gym/dist/fundamentals/index.html
+      - name: Verify lessons and checking under the Pages prefix
+        env:
+          DOJO_REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          preview_dir=$(mktemp -d)
+          ln -s "$PWD/browser_gym/dist" "$preview_dir/$DOJO_REPO_NAME"
+          python3 -m http.server 8000 --directory "$preview_dir" > /tmp/dojo-pages-http.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid"' EXIT
+          curl --fail --retry 5 --retry-connrefused --retry-delay 1 "http://localhost:8000/$DOJO_REPO_NAME/lab/" > /dev/null
+          node browser_gym/extension/tests/pages-smoke.cjs "http://localhost:8000/$DOJO_REPO_NAME/lab/"
+          node browser_gym/extension/tests/fundamentals-smoke.cjs "http://localhost:8000/$DOJO_REPO_NAME/fundamentals/"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: browser_gym/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
